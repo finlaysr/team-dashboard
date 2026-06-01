@@ -1,6 +1,6 @@
 #set document(title: "CA Team Lines", author: "Camanachd Association")
 
-#set page(paper: "a4", margin: (x: 0.8cm, y: 0.5cm), fill: rgb(4, 100, 25) )
+#set page(paper: "a4", margin: (x: 0.8cm, y: 0.5cm))
 #set text(lang: "EN", region: "GB", font: "PT Sans", size: 14pt)
 
 #let darkblue = rgb(9, 13, 127)
@@ -28,11 +28,11 @@
 }
 
 #block(below: 18pt)[
-  #text(size: 29pt, fill: white)[
+  #text(size: 29pt)[
     *Camanachd Association * | Official Team Lines
   ]
 ]
-#box(fill: rgb(255, 255, 255, 158), 
+#box(fill: rgb(200, 200, 200, 128), 
      width: 100%, 
      radius: 0.5cm,
      inset: 0.3cm,
