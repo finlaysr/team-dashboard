@@ -1,0 +1,21 @@
+{
+  "competition": "Bullogh Cup",
+  "date": "12/03/2026",
+  "homeTeam": "GMA",
+  "visitors": "Kyles",
+  "players": [
+    {"num": 1, "name": "Bob", "membNum": 123456, "youthHelmet": "Y"},
+    {"num": 2, "name": "Ben", "membNum": 56789, "youthHelmet": ""},
+    {"num": 16, "name": "A loooong players name", "membNum": 123, "youthHelmet": "HW"},
+    {"num": 4, "name": "Bill", "membNum": 5423, "youthHelmet": ""},
+    {"num": 3, "name": "another players name", "membNum": 853, "youthHelmet": "Y"}
+  ],
+  "substitutes": [
+    {"num": 9, "name": "Sub 1", "membNum": 431, "youthHelmet": "HW"},
+    {"num": 7, "name": "Sub 2", "membNum": 53235, "youthHelmet": ""},
+    {"num": 19, "name": "A very long substitutes name", "membNum": 123, "youthHelmet": "Y"}
+  ],
+  "referee": "Referee Bob",
+  "printName": "Coach Bob",
+  "club": "GMA Glasgow Mid Argyl Shinty Club"
+}
