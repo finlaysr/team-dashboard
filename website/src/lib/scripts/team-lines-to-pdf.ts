@@ -11,6 +11,21 @@ $typst.setRendererInitOptions({
 export async function toSVG(input: string) {
   console.log("Starting compiling");
   let svg = await $typst.svg({ mainContent: input });
-  console.log(svg);
   return svg;
+}
+
+export async function toPDF(input: string): Promise<Blob | undefined> {
+  console.log("Starting compiling");
+  let pdfData = await $typst.pdf({ mainContent: input });
+  if (!pdfData) {
+    return undefined;
+  }
+
+  const bytes = new Uint8Array(pdfData.byteLength);
+  bytes.set(pdfData);
+
+  let pdfBlob = new Blob([bytes], {
+    type: "application/pdf",
+  });
+  return pdfBlob;
 }
