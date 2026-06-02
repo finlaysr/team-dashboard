@@ -1,11 +1,18 @@
 <script lang="ts">
-  import { toSVG, toPDF } from "$lib/scripts/team-lines-to-pdf";
-  let input = $state("= Welcome! \n hello typst! \\ $1/2$");
+  import { TeamLinesDoc } from "$lib/scripts/team-lines-to-pdf";
+  import { onMount } from "svelte";
   let output = $state("");
+  let teamLinesDoc = new TeamLinesDoc();
+
+  onMount(async () => {
+    await teamLinesDoc.init().catch((error) => {
+      console.error("Failed to initialize Typst:", error);
+    });
+  });
 
   async function pdfButton() {
     console.log("staring compiling");
-    let pdfBlob = await toPDF(input);
+    let pdfBlob = await teamLinesDoc.toPDF();
     if (!pdfBlob) {
       alert("Failed to generate PDF!");
       return;
@@ -21,12 +28,10 @@
   documentation
 </p>
 
-<textarea bind:value={input} rows="10" cols="100"></textarea>
-<br />
 <button
   onclick={async () => {
     console.log("staring previewing");
-    output = await toSVG(input);
+    output = await teamLinesDoc.toSVG();
   }}>Generate SVG</button
 >
 <button
