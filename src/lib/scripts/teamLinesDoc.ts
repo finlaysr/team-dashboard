@@ -59,6 +59,13 @@ export class TeamLinesDoc {
     this.typst.mapShadow("/data.json", new TextEncoder().encode(jsonFile));
   }
 
+  async updateData(data: teamLinesDocInputs) {
+    if (!this.typst) return;
+
+    const jsonFile: string = JSON.stringify(data);
+    this.typst.mapShadow("/data.json", new TextEncoder().encode(jsonFile));
+  }
+
   async toSVG(): Promise<string> {
     if (!this.typst) return "";
 
@@ -82,4 +89,26 @@ export class TeamLinesDoc {
     });
     return pdfBlob;
   }
+}
+
+export interface teamLinesDocInputs {
+  competition: string;
+  date: string;
+  homeTeam: string;
+  visitors: string;
+  players: TeamLinePlayer[];
+  substitutes: TeamLinePlayer[];
+  referee: string;
+  printName: string;
+  club: string;
+  options: {
+    u17Competition: boolean;
+  }
+}
+
+interface TeamLinePlayer {
+  num: string;
+  name: string;
+  membNum: string;
+  youthHelmet: string;
 }
