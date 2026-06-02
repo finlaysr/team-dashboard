@@ -17,5 +17,8 @@
   ],
   "referee": "Referee Bob",
   "printName": "Coach Bob",
-  "club": "GMA Glasgow Mid Argyl Shinty Club"
+  "club": "GMA Glasgow Mid Argyl Shinty Club",
+  "options": {
+    "u17Competition": true
+  }
 }
