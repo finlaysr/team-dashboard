@@ -2,14 +2,17 @@
   import { TeamLinesDoc } from "$lib/scripts/teamLinesDoc";
   import type { teamLinesDocInputs } from "$lib/scripts/teamLinesDoc";
   import { onMount } from "svelte";
+  import loadingSvg from "$lib/assets/loading.svg";
   let output = $state("");
   let teamLinesDoc = new TeamLinesDoc();
 
+  let loading = $state(true);
   onMount(async () => {
     await teamLinesDoc.init().catch((error) => {
       console.error("Failed to initialize Typst:", error);
     });
     output = await teamLinesDoc.toSVG();
+    loading = false;
   });
 
   async function pdfButton() {
@@ -33,7 +36,11 @@
     referee: "",
     printName: "",
     club: "",
-    options: { u17Competition: false },
+    options: {
+      u17Competition: false,
+      playerCount: 12,
+      subCount: 5,
+    },
   });
 </script>
 
@@ -57,6 +64,22 @@
         <input type="text" bind:value={inputs.printName} />
         <p style="padding: 0.25rem; margin: 0;">Club:</p>
         <input type="text" bind:value={inputs.club} />
+        <p style="padding: 0.25rem; margin: 0;">Player Count:</p>
+        <input
+          type="number"
+          bind:value={inputs.options.playerCount}
+          min="0"
+          max="20"
+        />
+        <p style="padding: 0.25rem; margin: 0;">Substitute Count:</p>
+        <input
+          type="number"
+          bind:value={inputs.options.subCount}
+          min="0"
+          max="10"
+        />
+        <p style="padding: 0.25rem; margin: 0;">U17 Competition:</p>
+        <input type="checkbox" bind:checked={inputs.options.u17Competition} />
       </div>
     </form>
     <br />
@@ -79,10 +102,30 @@
 
   <div>
     <h2>Output:</h2>
-    <div
-      style="border: 1px solid #000; width: fit-content; height: fit-content;"
-    >
-      {@html output}
-    </div>
+    {#if loading}
+      <p>Loading...</p>
+      <img src={loadingSvg} alt="Loading..." class="spinning" width="50px" />
+    {:else}
+      <div
+        style="border: 1px solid #000; width: fit-content; height: fit-content;"
+      >
+        {@html output}
+      </div>
+    {/if}
   </div>
 </div>
+
+<style>
+  .spinning {
+    animation: spin 2.5s linear infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>

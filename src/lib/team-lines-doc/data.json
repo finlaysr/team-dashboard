@@ -9,6 +9,8 @@
   "printName": "",
   "club": "",
   "options": {
-    "u17Competition": false
+    "u17Competition": false,
+    "playerCount": 12,
+    "subCount": 5
   }
 }

@@ -14,8 +14,8 @@
 }
 
 #let data = json("data.json")
-#let playerCount = 17
-#let subCount = 0
+#let playerCount = data.options.playerCount
+#let subCount = data.options.subCount
 
 // Function to format fields from data file as underlined and italic
 #let underlined(body, width: auto) = {
@@ -94,7 +94,10 @@
             bottom: darkblue + 0.5pt,
           )
         },
-        [Jersey No.], [Name], [Membership No.], [Youth Player (Y)\ Helmet Waiver (HW)],
+        [Jersey No.],
+        [Name],
+        [Membership No.],
+        [#if data.options.u17Competition [Date of Birth] else [Youth Player (Y)\ Helmet Waiver (HW)]],
 
         ..data
           .substitutes
