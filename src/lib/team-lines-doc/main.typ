@@ -62,7 +62,7 @@
       [Jersey No.],
       [Name],
       [Membership No.],
-      [#if data.options.u17Competition [Date of Birth] else [Youth Player (Y)\ Helmet Waiver (HW)]],
+      [#if data.options.youthCompetition [Date of Birth] else [Youth Player (Y)\ Helmet Waiver (HW)]],
 
       ..data
         .players
@@ -97,7 +97,7 @@
         [Jersey No.],
         [Name],
         [Membership No.],
-        [#if data.options.u17Competition [Date of Birth] else [Youth Player (Y)\ Helmet Waiver (HW)]],
+        [#if data.options.youthCompetition [Date of Birth] else [Youth Player (Y)\ Helmet Waiver (HW)]],
 
         ..data
           .substitutes
@@ -107,7 +107,7 @@
       )
     ]
   ]
-  #if not (data.options.u17Competition) [
+  #if not (data.options.youthCompetition) [
     #block(above: 8pt)[
       #box(inset: (left: 0.7cm, right: 0.3cm, y: 0cm))[
         #text(size: 11.5pt)[

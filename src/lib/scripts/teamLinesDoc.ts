@@ -102,7 +102,7 @@ export interface teamLinesDocInputs {
   printName: string;
   club: string;
   options: {
-    u17Competition: boolean;
+    youthCompetition: boolean;
     playerCount: number;
     subCount: number;
   }

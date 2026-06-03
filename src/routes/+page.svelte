@@ -37,7 +37,7 @@
     printName: "",
     club: "",
     options: {
-      u17Competition: false,
+      youthCompetition: false,
       playerCount: 12,
       subCount: 5,
     },
@@ -78,8 +78,8 @@
           min="0"
           max="10"
         />
-        <p style="padding: 0.25rem; margin: 0;">U17 Competition:</p>
-        <input type="checkbox" bind:checked={inputs.options.u17Competition} />
+        <p style="padding: 0.25rem; margin: 0;">Youth Competition:</p>
+        <input type="checkbox" bind:checked={inputs.options.youthCompetition} />
       </div>
     </form>
     <br />
