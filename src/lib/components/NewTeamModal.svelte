@@ -1,15 +1,13 @@
 <script lang="ts">
     import { teams } from "$lib/scripts/teams.svelte";
 
-    let {
-        showModal = $bindable(),
-        onCreated,
-    }: { showModal: boolean; onCreated: (team: any) => void } = $props();
+    let { showModal = $bindable() }: { showModal: boolean } = $props();
     let dialog: HTMLDialogElement | null = $state(null);
 
     let teamName: string = $state("");
     let subTeams: string[] = $state(["First Team"]);
     let subTeamCount = $state(1);
+    let youthTeam: boolean = $state(false);
 
     $effect(() => {
         if (showModal) {
@@ -17,6 +15,7 @@
             subTeamCount = 1;
             teamName = "";
             subTeams = ["First Team"];
+            youthTeam = false;
         }
     });
 </script>
@@ -32,9 +31,8 @@
     <form
         onsubmit={(e) => {
             e.preventDefault();
-            teams.addTeam(teamName, subTeams);
-            const newTeam = $derived(teams.teams[teams.teams.length - 1]);
-            onCreated(newTeam);
+            teams.addTeam(teamName, subTeams, youthTeam);
+            dialog?.close();
         }}
     >
         <p>Team Name:</p>
@@ -50,16 +48,20 @@
             {/each}
             <button
                 type="button"
+                class="primary"
                 onclick={() => {
                     subTeamCount += 1;
                 }}>New Sub Team</button
             >
         </div>
-        <div style="margin-top: 1rem;">
-            <button type="submit" onclick={() => dialog?.close()}
-                >Create!</button
+        <p>
+            <label
+                ><input type="checkbox" bind:checked={youthTeam} /> Youth Team</label
             >
+        </p>
+        <div style="margin-top: 1rem;">
             <button onclick={() => dialog?.close()}>Cancel</button>
+            <button type="submit" class="primary">Create!</button>
         </div>
     </form>
 </dialog>

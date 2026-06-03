@@ -13,3 +13,31 @@ dialog {
 dialog p {
     margin: 0.5em 0;
 }
+
+button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+    margin: 0;
+    border: none;
+    border-radius: 0.5rem;
+
+    cursor: pointer;
+}
+
+.primary {
+    background-color: #34b83f;
+    color: white;
+}
+
+.primary:hover {
+    background-color: #2e9c35;
+}
+
+.danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.danger:hover {
+    background-color: #c82333;
+}

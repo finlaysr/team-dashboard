@@ -7,17 +7,20 @@
     let dialog: HTMLDialogElement | null = $state(null);
 
     let playerName: string = $state("");
+    let membershipNum: string = $state("");
     let position: Position = $state(Position.ANY);
     let subTeams: string = $state(team.subteams[0] || "");
     let namedPlayer: boolean = $state(false);
-
+    let youthOptions: string = $state("");
     $effect(() => {
         if (showModal) {
             dialog?.showModal();
             playerName = "";
+            membershipNum = "";
             position = Position.ANY;
             subTeams = team.subteams[0] || "";
             namedPlayer = false;
+            youthOptions = "";
         }
     });
 </script>
@@ -34,13 +37,22 @@
         onsubmit={(e) => {
             e.preventDefault();
             team.addPlayer(
-                new Player(playerName.trim(), position, subTeams, namedPlayer),
+                new Player(
+                    playerName.trim(),
+                    membershipNum.trim(),
+                    position,
+                    subTeams,
+                    namedPlayer,
+                    youthOptions.trim(),
+                ),
             );
             dialog?.close();
         }}
     >
         <p>Player Name:</p>
         <input type="text" required bind:value={playerName} />
+        <p>Membership Number:</p>
+        <input type="text" required bind:value={membershipNum} />
         <p>Position:</p>
         <select bind:value={position}>
             <option value={Position.ANY}>Any</option>
@@ -61,9 +73,20 @@
             <input type="checkbox" bind:checked={namedPlayer} />
             Named Player
         </label>
+        {#if team.youthTeam}
+            <p>Date of Birth:</p>
+            <input type="date" bind:value={youthOptions} />
+        {:else}
+            <p>Youth Player or Helmet Waiver:</p>
+            <select bind:value={youthOptions}>
+                <option value="">Neither</option>
+                <option value="Y">Youth Player</option>
+                <option value="HW">Helmet Waiver</option>
+            </select>
+        {/if}
         <div style="margin-top: 1rem;">
-            <button type="submit">Create!</button>
             <button onclick={() => dialog?.close()}>Cancel</button>
+            <button type="submit" class="primary">Create!</button>
         </div>
     </form>
 </dialog>

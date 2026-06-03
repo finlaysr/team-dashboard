@@ -3,9 +3,6 @@
     import type { teamLinesDocInputs } from "$lib/scripts/teamLinesDoc";
     import { onMount } from "svelte";
     import loadingSvg from "$lib/assets/loading.svg";
-    import type { Team } from "$lib/scripts/team.svelte";
-
-    let { team }: { team: Team } = $props();
 
     let inputs: teamLinesDocInputs = $state({
         competition: "",
