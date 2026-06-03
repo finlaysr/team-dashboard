@@ -1,12 +1,12 @@
 export class Team {
-  readonly name: string;
-  readonly subteams: string[];
-  readonly players: Player[] = [];
-  private availability: Map<Player, Availability> = new Map();
+  readonly name: string = $state("");
+  readonly subteams: string[] = $state([]);
+  readonly players: Player[] = $state([]);
+  private availability: Map<Player, Availability> = $state(new Map());
 
   constructor(name: string, subteams: string[] = ["First Team"]) {
     this.name = name.trim();
-    this.subteams = subteams.map(s => s.trim());
+    this.subteams = subteams.map(s => s.trim()).filter(s => s.length > 0);
   }
 
   addPlayer(player: Player) {
@@ -38,6 +38,13 @@ export class Team {
     if (newSubteam !== undefined) updated.subteam = newSubteam.trim();
     if (newNamed !== undefined) updated.named = newNamed;
   }
+
+  addSubteam(subteam: string) {
+    subteam = subteam.trim();
+    if (subteam.length > 0 && !this.subteams.includes(subteam)) {
+      this.subteams.push(subteam);
+    }
+  }
 }
 
 export class Player {
@@ -54,12 +61,12 @@ export class Player {
   }
 }
 
-enum Position {
-  GK,
-  DEF,
-  CEN,
-  FWD,
-  ANY = GK | DEF | CEN | FWD,
+export enum Position {
+  GK = "Goal Keeper",
+  DEF = "Defender",
+  CEN = "Midfielder",
+  FWD = "Forward",
+  ANY = "Any",
 }
 
 enum Availability {

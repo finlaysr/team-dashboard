@@ -1,131 +1,105 @@
 <script lang="ts">
-  import { TeamLinesDoc } from "$lib/scripts/teamLinesDoc";
-  import type { teamLinesDocInputs } from "$lib/scripts/teamLinesDoc";
-  import { onMount } from "svelte";
-  import loadingSvg from "$lib/assets/loading.svg";
-  let output = $state("");
-  let teamLinesDoc = new TeamLinesDoc();
+    import type { Team } from "$lib/scripts/team.svelte";
+    import { teams } from "$lib/scripts/teams.svelte";
+    import TeamLinesDoc from "$lib/tabs/TeamLinesDoc.svelte";
+    import TeamTab from "$lib/tabs/TeamTab.svelte";
+    import NewTeamModal from "$lib/components/NewTeamModal.svelte";
 
-  let loading = $state(true);
-  onMount(async () => {
-    await teamLinesDoc.init().catch((error) => {
-      console.error("Failed to initialize Typst:", error);
-    });
-    output = await teamLinesDoc.toSVG();
-    loading = false;
-  });
-
-  async function pdfButton() {
-    console.log("staring compiling");
-    let pdfBlob = await teamLinesDoc.toPDF();
-    if (!pdfBlob) {
-      alert("Failed to generate PDF!");
-      return;
+    let currTeam: Team | null = $derived(null);
+    if (teams.teams.length > 0) {
+        currTeam = teams.teams[0];
     }
-    let url = URL.createObjectURL(pdfBlob);
-    window.open(url);
-  }
 
-  let inputs: teamLinesDocInputs = $state({
-    competition: "",
-    date: "",
-    homeTeam: "",
-    visitors: "",
-    players: [],
-    substitutes: [],
-    referee: "",
-    printName: "",
-    club: "",
-    options: {
-      youthCompetition: false,
-      playerCount: 12,
-      subCount: 5,
-    },
-  });
+    let tabs = $state([
+        { name: "Team", comp: TeamTab },
+        { name: "Team Lines", comp: TeamLinesDoc },
+    ]);
+    let currTab = $state(tabs[0]);
+
+    let showNewTeam: boolean = $state(false);
 </script>
 
-<h1>Team Lines Generator</h1>
-<div style="display: flex; gap: 2rem;">
-  <div>
-    <h2>Inputs:</h2>
-    <form>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-        <p style="padding: 0.25rem; margin: 0;">Competition:</p>
-        <input type="text" bind:value={inputs.competition} />
-        <p style="padding: 0.25rem; margin: 0;">Date:</p>
-        <input type="text" bind:value={inputs.date} />
-        <p style="padding: 0.25rem; margin: 0;">Home Team:</p>
-        <input type="text" bind:value={inputs.homeTeam} />
-        <p style="padding: 0.25rem; margin: 0;">Visitors:</p>
-        <input type="text" bind:value={inputs.visitors} />
-        <p style="padding: 0.25rem; margin: 0;">Referee:</p>
-        <input type="text" bind:value={inputs.referee} />
-        <p style="padding: 0.25rem; margin: 0;">Print Name:</p>
-        <input type="text" bind:value={inputs.printName} />
-        <p style="padding: 0.25rem; margin: 0;">Club:</p>
-        <input type="text" bind:value={inputs.club} />
-        <p style="padding: 0.25rem; margin: 0;">Player Count:</p>
-        <input
-          type="number"
-          bind:value={inputs.options.playerCount}
-          min="0"
-          max="20"
-        />
-        <p style="padding: 0.25rem; margin: 0;">Substitute Count:</p>
-        <input
-          type="number"
-          bind:value={inputs.options.subCount}
-          min="0"
-          max="10"
-        />
-        <p style="padding: 0.25rem; margin: 0;">Youth Competition:</p>
-        <input type="checkbox" bind:checked={inputs.options.youthCompetition} />
-      </div>
-    </form>
-    <br />
-    <button
-      onclick={async () => {
-        console.log("staring previewing");
-        await teamLinesDoc.updateData(inputs);
-        output = await teamLinesDoc.toSVG();
-      }}>Update Preview</button
-    >
-
-    <button
-      onclick={async () => {
-        console.log("staring compiling");
-        await teamLinesDoc.updateData(inputs);
-        await pdfButton();
-      }}>Generate PDF</button
-    >
-  </div>
-
-  <div>
-    <h2>Output:</h2>
-    {#if loading}
-      <p>Loading...</p>
-      <img src={loadingSvg} alt="Loading..." class="spinning" width="50px" />
+<main>
+    <div id="header">
+        <h1>Team Dashboard</h1>
+        {#if currTeam}
+            <p style="padding: 0rem; margin: 0;">Current Team:</p>
+            <form>
+                <select bind:value={currTeam}>
+                    {#each teams.teams as team}
+                        <option value={team}>{team.name}</option>
+                    {/each}
+                </select>
+            </form>
+            <button onclick={() => (showNewTeam = true)}>
+                Create New Team
+            </button>
+        {/if}
+    </div>
+    <NewTeamModal
+        bind:showModal={showNewTeam}
+        onCreated={(team) => (currTeam = team)}
+    />
+    {#if !currTeam}
+        <div class="content">
+            <h2>Welcome to the Team Dashboard!</h2>
+            <p>To get started, please create a new team.</p>
+            <button onclick={() => (showNewTeam = true)}>
+                Create New Team
+            </button>
+        </div>
     {:else}
-      <div
-        style="border: 1px solid #000; width: fit-content; height: fit-content;"
-      >
-        {@html output}
-      </div>
+        <div class="tabs">
+            {#each tabs as tab}
+                <button
+                    class:selected={currTab === tab}
+                    onclick={() => (currTab = tab)}
+                >
+                    {tab.name}
+                </button>
+            {/each}
+        </div>
+
+        <div class="content">
+            <currTab.comp team={currTeam} />
+        </div>
     {/if}
-  </div>
-</div>
+</main>
 
 <style>
-  .spinning {
-    animation: spin 2.5s linear infinite;
-  }
+    .tabs {
+        display: flex;
+        width: 100%;
+        background-color: #eee;
+    }
 
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
+    .tabs button {
+        padding: 0.5rem 1rem;
+        border: none;
+        background-color: #eee;
+        cursor: pointer;
+        font-size: 1.25rem;
     }
-    to {
-      transform: rotate(360deg);
+
+    .tabs button.selected {
+        background-color: #ddd;
+        font-weight: bold;
     }
-  }
+
+    form {
+        display: inline-block;
+    }
+
+    #header {
+        background-color: #083e00;
+        color: white;
+        padding: 0.5rem 1rem;
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .content {
+        padding: 1rem;
+    }
 </style>

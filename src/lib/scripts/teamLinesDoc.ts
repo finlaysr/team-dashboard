@@ -4,8 +4,11 @@ type TypstModule = typeof import("@myriaddreamin/typst.ts");
 
 export class TeamLinesDoc {
   typst: TypstModule["$typst"] | null = null;
+  loaded: boolean = false;
 
   async init(): Promise<void> {
+    if (this.loaded) return;
+
     if (!browser) {
       throw new Error("Typst rendering is only available in the browser.");
     }
@@ -57,6 +60,8 @@ export class TeamLinesDoc {
 
     const jsonFile: string = (await import("$lib/team-lines-doc/data.json?raw")).default;
     this.typst.mapShadow("/data.json", new TextEncoder().encode(jsonFile));
+
+    this.loaded = true;
   }
 
   async updateData(data: teamLinesDocInputs) {
