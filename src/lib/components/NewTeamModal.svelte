@@ -38,17 +38,22 @@
         <p>Team Name:</p>
         <input type="text" required bind:value={teamName} />
         <p>Sub Teams:</p>
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            {#each Array(subTeamCount) as _, i}
-                <input
-                    type="text"
-                    required={i === 0}
-                    bind:value={subTeams[i]}
-                />
-            {/each}
+        <div
+            style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;"
+        >
+            <div>
+                {#each Array(subTeamCount) as _, i}
+                    <input
+                        type="text"
+                        required={i === 0}
+                        bind:value={subTeams[i]}
+                    />
+                    <br />
+                {/each}
+            </div>
+
             <button
                 type="button"
-                class="primary"
                 onclick={() => {
                     subTeamCount += 1;
                 }}>New Sub Team</button

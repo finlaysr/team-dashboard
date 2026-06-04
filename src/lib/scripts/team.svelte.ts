@@ -15,7 +15,7 @@ export class Team {
     this.players.push(player);
   }
 
-  removePlayer(player: Player): boolean {
+  deletePlayer(player: Player): boolean {
     if (this.players.includes(player)) {
       this.players.splice(this.players.indexOf(player), 1);
       return true;
@@ -23,11 +23,12 @@ export class Team {
     return false;
   }
 
-  updatePlayer(player: Player, newName?: string, newPosition?: Position, newSubteam?: string, newNamed?: boolean, newYouthOptions?: string) {
+  updatePlayer(player: Player, newName?: string, newMembership?: string, newPosition?: Position, newSubteam?: string, newNamed?: boolean, newYouthOptions?: string) {
     let updated = this.players.find(p => p === player);
     if (!updated) { return };
 
     if (newName !== undefined) updated.name = newName.trim();
+    if (newMembership !== undefined) updated.membershipNum = newMembership.trim();
     if (newPosition !== undefined) updated.position = newPosition;
     if (newSubteam !== undefined) updated.subteam = newSubteam.trim();
     if (newNamed !== undefined) updated.named = newNamed;

@@ -3,13 +3,17 @@
     import EditSubTeamModal from "$lib/components/EditSubTeamModal.svelte";
     import NewSubTeamModal from "$lib/components/NewSubTeamModal.svelte";
     import EditTeamModal from "$lib/components/EditTeamModal.svelte";
+    import EditPlayerModal from "$lib/components/EditPlayerModal.svelte";
+    import type { Player } from "$lib/scripts/team.svelte";
     import { teams } from "$lib/scripts/teams.svelte";
 
     let showNewSubTeamModal: boolean = $state(false);
     let showNewPlayerModal: boolean = $state(false);
     let showEditSubTeamModal: boolean = $state(false);
     let subTeamToEdit: string = $state("");
-    let editTeamModal: boolean = $state(false);
+    let showEditTeamModal: boolean = $state(false);
+    let showEditPlayerModal: boolean = $state(false);
+    let playerToEdit: Player | null = $state(null);
 </script>
 
 {#if teams.currentTeam}
@@ -22,8 +26,11 @@
         bind:showModal={showNewPlayerModal}
         team={teams.currentTeam}
     />
+    {#if playerToEdit}
+        <EditPlayerModal bind:showModal={showEditPlayerModal} {playerToEdit} />
+    {/if}
     <EditTeamModal
-        bind:showModal={editTeamModal}
+        bind:showModal={showEditTeamModal}
         currentName={teams.currentTeam.name}
     />
 
@@ -92,6 +99,7 @@
                     {:else}
                         <th>Youth Player (Y) or Helmet Waiver (HW)</th>
                     {/if}
+                    <th>Actions</th>
                 </tr>
             </thead>
 
@@ -104,6 +112,29 @@
                         <td> {player.subteam} </td>
                         <td> {player.named ? "Yes" : "No"} </td>
                         <td> {player.youthOptions} </td>
+                        <td>
+                            <button
+                                onclick={() => {
+                                    playerToEdit = player;
+                                    showEditPlayerModal = true;
+                                }}
+                            >
+                                Edit
+                            </button>
+                            <button
+                                class="danger"
+                                onclick={() => {
+                                    if (
+                                        window.confirm(
+                                            `Are you sure you want to delete the player "${player.name}"? This action cannot be undone.`,
+                                        )
+                                    ) {
+                                        teams.currentTeam?.deletePlayer(player);
+                                    }
+                                }}
+                                >Delete
+                            </button></td
+                        >
                     </tr>
                 {/each}
             </tbody>
@@ -112,7 +143,7 @@
 
     <button
         onclick={() => {
-            editTeamModal = true;
+            showEditTeamModal = true;
         }}
     >
         Edit Team
