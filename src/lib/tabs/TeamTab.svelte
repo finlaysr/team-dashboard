@@ -139,6 +139,11 @@
                 {/each}
             </tbody>
         </table>
+        <p
+            style="margin-top: 1rem; margin-bottom: 0.5rem; color: #555; font-size: 0.875rem; padding: 0 1rem;"
+        >
+            {teams.currentTeam?.players.length} players shown
+        </p>
     </div>
 
     <button
@@ -185,26 +190,6 @@
         border: 1px solid #ccc;
         border-radius: 0.25rem;
         background-color: #fff;
-    }
-
-    .rounded_block {
-        border: 1px solid #ccc;
-        border-radius: 0.5rem;
-        padding: 0.5rem;
-        margin-bottom: 1rem;
-        background-color: #f9f9f9;
-    }
-
-    .rounded_block .top_row {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-        justify-content: space-between;
-    }
-
-    .rounded_block h3 {
-        padding: 0;
-        margin: 0;
     }
 
     thead {

@@ -62,7 +62,7 @@
         <p>Player Name:</p>
         <input type="text" required bind:value={newName} />
         <p>Membership Number:</p>
-        <input type="text" required bind:value={newMembership} />
+        <input type="text" bind:value={newMembership} />
         <p>Position:</p>
         <select bind:value={newPosition}>
             <option value={Position.ANY}>Any</option>

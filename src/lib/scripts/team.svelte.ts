@@ -4,7 +4,6 @@ export class Team {
   name: string = $state("");
   readonly subteams: string[] = $state([]);
   readonly players: Player[] = $state([]);
-  private availability: Map<Player, Availability> = $state(new Map());
   youthTeam: boolean = $state(false);
 
   constructor(name: string, subteams: string[] = ["First Team"], youthTeam: boolean, players?: Player[]) {
@@ -63,10 +62,6 @@ export class Team {
     if (newNamed !== undefined) updated.named = newNamed;
     if (newYouthOptions !== undefined) updated.youthOptions = newYouthOptions.trim();
     return true;
-  }
-
-  setAvailability(player: Player, availability: Availability) {
-    this.availability.set(player, availability);
   }
 
   addSubteam(subteam: string): boolean {
@@ -171,10 +166,3 @@ export enum Position {
   ANY = "Any",
 }
 
-enum Availability {
-  YES,
-  MAYBE,
-  INJURED,
-  NO,
-  NO_REPLY
-}

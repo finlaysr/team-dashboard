@@ -3,6 +3,7 @@
     import TeamLinesDoc from "$lib/tabs/TeamLinesDoc.svelte";
     import TeamTab from "$lib/tabs/TeamTab.svelte";
     import NewTeamModal from "$lib/components/NewTeamModal.svelte";
+    import MatchesTab from "$lib/tabs/MatchesTab.svelte";
     import { onMount } from "svelte";
     let loaded = $state(false);
     onMount(() => {
@@ -14,6 +15,7 @@
 
     let tabs = $state([
         { name: "Team", comp: TeamTab },
+        { name: "Matches", comp: MatchesTab },
         { name: "Team Lines", comp: TeamLinesDoc },
     ]);
     let currTab = $state(tabs[0]);
@@ -49,7 +51,7 @@
         {#if teams.teams.length === 0 || !teams.currentTeam}
             <div class="content">
                 <h2>Welcome to the Team Dashboard!</h2>
-                <p>To get started, please create a new team.</p>
+                <p>To get started, please create a new team!</p>
                 <button
                     onclick={() => (showNewTeamModal = true)}
                     class="primary"
@@ -114,12 +116,6 @@
         display: flex;
         gap: 2rem;
         align-items: center;
-    }
-
-    .content {
-        padding: 1rem;
-        max-width: 1400px;
-        margin: 0 auto;
     }
 
     select {
