@@ -1,3 +1,5 @@
+import { teams } from "$lib/scripts/teams.svelte";
+
 export class Team {
   name: string = $state("");
   readonly subteams: string[] = $state([]);
@@ -5,10 +7,32 @@ export class Team {
   private availability: Map<Player, Availability> = $state(new Map());
   youthTeam: boolean = $state(false);
 
-  constructor(name: string, subteams: string[] = ["First Team"], youthTeam: boolean) {
+  constructor(name: string, subteams: string[] = ["First Team"], youthTeam: boolean, players?: Player[]) {
     this.name = name.trim();
     this.subteams = subteams.map(s => s.trim()).filter(s => s.length > 0);
     this.youthTeam = youthTeam;
+    if (players) {
+      this.players = players;
+    }
+  }
+
+  toJSON() {
+    return {
+      name: $state.snapshot(this.name),
+      subteams: $state.snapshot(this.subteams),
+      players: $state.snapshot(this.players),
+      youthTeam: $state.snapshot(this.youthTeam)
+    }
+  }
+
+  static fromJSON(data: string): Team {
+    let json = JSON.parse(data);
+    return new Team(
+      json.name,
+      json.subteams,
+      json.youthTeam,
+      json.players.map((p: any) => Player.fromJSON(JSON.stringify(p)))
+    );
   }
 
   addPlayer(player: Player) {
@@ -82,6 +106,8 @@ export class Team {
       this.players.forEach(player => { player.youthOptions = "" });
     }
   }
+
+
 }
 
 export class Player {
@@ -99,6 +125,29 @@ export class Player {
     this.subteam = subteam.trim();
     this.named = named;
     this.youthOptions = youthOptions.trim();
+  }
+
+  toJSON() {
+    return {
+      name: $state.snapshot(this.name),
+      membershipNum: $state.snapshot(this.membershipNum),
+      position: $state.snapshot(this.position),
+      subteam: $state.snapshot(this.subteam),
+      named: $state.snapshot(this.named),
+      youthOptions: $state.snapshot(this.youthOptions)
+    }
+  }
+
+  static fromJSON(data: any): Player {
+    let json = JSON.parse(data);
+    return new Player(
+      json.name,
+      json.membershipNum,
+      json.position,
+      json.subteam,
+      json.named,
+      json.youthOptions
+    );
   }
 }
 

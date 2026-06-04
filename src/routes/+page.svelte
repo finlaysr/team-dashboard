@@ -3,14 +3,26 @@
     import TeamLinesDoc from "$lib/tabs/TeamLinesDoc.svelte";
     import TeamTab from "$lib/tabs/TeamTab.svelte";
     import NewTeamModal from "$lib/components/NewTeamModal.svelte";
+    import { onMount } from "svelte";
+    let loaded = $state(false);
+    onMount(() => {
+        if (!loaded) {
+            teams.loadFromStorage();
+            loaded = true;
+        }
+    });
 
     let tabs = $state([
         { name: "Team", comp: TeamTab },
         { name: "Team Lines", comp: TeamLinesDoc },
     ]);
     let currTab = $state(tabs[0]);
-
     let showNewTeamModal: boolean = $state(false);
+
+    // Save teams to localStorage whenever they change
+    $effect(() => {
+        teams.saveToStorage();
+    });
 </script>
 
 <main>
@@ -33,30 +45,39 @@
         {/if}
     </div>
 
-    {#if teams.teams.length === 0 || !teams.currentTeam}
-        <div class="content">
-            <h2>Welcome to the Team Dashboard!</h2>
-            <p>To get started, please create a new team.</p>
-            <button onclick={() => (showNewTeamModal = true)} class="primary">
-                Create New Team
-            </button>
-        </div>
-    {:else}
-        <div class="tabs">
-            {#each tabs as tab}
+    {#if loaded}
+        {#if teams.teams.length === 0 || !teams.currentTeam}
+            <div class="content">
+                <h2>Welcome to the Team Dashboard!</h2>
+                <p>To get started, please create a new team.</p>
                 <button
-                    class:selected={currTab === tab}
-                    onclick={() => (currTab = tab)}
+                    onclick={() => (showNewTeamModal = true)}
+                    class="primary"
                 >
-                    {tab.name}
+                    Create New Team
                 </button>
-            {/each}
-        </div>
+            </div>
+        {:else}
+            <div class="tabs">
+                {#each tabs as tab}
+                    <button
+                        class:selected={currTab === tab}
+                        onclick={() => (currTab = tab)}
+                    >
+                        {tab.name}
+                    </button>
+                {/each}
+            </div>
 
+            <div class="content">
+                {#if teams.currentTeam}
+                    <currTab.comp />
+                {/if}
+            </div>
+        {/if}
+    {:else}
         <div class="content">
-            {#if teams.currentTeam}
-                <currTab.comp />
-            {/if}
+            <h2>Loading teams...</h2>
         </div>
     {/if}
 </main>
@@ -104,7 +125,5 @@
     select {
         padding: 0.25rem;
         font-size: 1rem;
-        border-radius: 0.25rem;
-        border: 1px solid #ccc;
     }
 </style>

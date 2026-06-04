@@ -46,7 +46,7 @@ button {
     background-color: #c82333;
 }
 
-input[type="text"] {
+input {
     padding: 0.25rem;
     font-size: 0.9rem;
     border: 1px solid #ccc;

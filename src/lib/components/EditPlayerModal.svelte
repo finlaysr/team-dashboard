@@ -90,7 +90,7 @@
         {/if}
         <div style="margin-top: 1rem;">
             <button onclick={() => dialog?.close()}>Cancel</button>
-            <button type="submit" class="primary">Create!</button>
+            <button type="submit" class="primary">Confirm</button>
         </div>
     </form>
 </dialog>
