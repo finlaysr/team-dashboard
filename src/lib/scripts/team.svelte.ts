@@ -35,8 +35,10 @@ export class Team {
     );
   }
 
-  addPlayer(player: Player) {
+  addPlayer(player: Player): boolean {
+    if (this.players.find(p => p.name === player.name)) { return false };
     this.players.push(player);
+    return true;
   }
 
   deletePlayer(player: Player): boolean {
@@ -47,32 +49,36 @@ export class Team {
     return false;
   }
 
-  updatePlayer(player: Player, newName?: string, newMembership?: string, newPosition?: Position, newSubteam?: string, newNamed?: boolean, newYouthOptions?: string) {
+  updatePlayer(player: Player, newName?: string, newMembership?: string, newPosition?: Position, newSubteam?: string, newNamed?: boolean, newYouthOptions?: string): boolean {
     let updated = this.players.find(p => p === player);
-    if (!updated) { return };
+    if (!updated) { return false };
 
-    if (newName !== undefined) updated.name = newName.trim();
+    if (newName !== undefined) {
+      if (this.players.find(p => p.name === newName && p !== player)) { return false };
+      updated.name = newName.trim();
+    }
     if (newMembership !== undefined) updated.membershipNum = newMembership.trim();
     if (newPosition !== undefined) updated.position = newPosition;
     if (newSubteam !== undefined) updated.subteam = newSubteam.trim();
     if (newNamed !== undefined) updated.named = newNamed;
     if (newYouthOptions !== undefined) updated.youthOptions = newYouthOptions.trim();
+    return true;
   }
 
   setAvailability(player: Player, availability: Availability) {
     this.availability.set(player, availability);
   }
 
-  addSubteam(subteam: string) {
+  addSubteam(subteam: string): boolean {
     subteam = subteam.trim();
-    if (subteam.length > 0 && !this.subteams.includes(subteam)) {
-      this.subteams.push(subteam);
-    }
-
+    if (this.subteams.includes(subteam) || subteam.length === 0) { return false };
+    this.subteams.push(subteam);
+    return true;
   }
 
-  editSubteam(oldName: string, newName: string) {
+  editSubteam(oldName: string, newName: string): boolean {
     const index = this.subteams.indexOf(oldName);
+    if (this.subteams.find(s => s === newName && s !== oldName)) { return false };
     if (index !== -1 && newName.trim().length > 0) {
       this.subteams[index] = newName;
       this.players.forEach(player => {
@@ -80,10 +86,12 @@ export class Team {
           player.subteam = newName;
         }
       });
+      return true;
     }
+    return false;
   }
 
-  deleteSubteam(name: string) {
+  deleteSubteam(name: string): boolean {
     const index = this.subteams.indexOf(name);
     if (index !== -1) {
       this.subteams.splice(index, 1);
@@ -92,19 +100,23 @@ export class Team {
           player.subteam = "";
         }
       });
+      return true;
     }
+    return false;
   }
 
   getSubteamPlayers(subteam: string, position: Position = Position.ANY): Player[] {
     return this.players.filter(player => player.subteam === subteam && player.position === position);
   }
 
-  updateTeam(name: string, youthTeam: boolean) {
-    this.name = name.trim();
-    if (this.youthTeam !== youthTeam) {
-      this.youthTeam = youthTeam;
+  updateTeam(newName: string, newYouthTeam: boolean): boolean {
+    if (teams.teams.find(t => t.name === newName && t !== this)) { return false };
+    this.name = newName.trim();
+    if (this.youthTeam !== newYouthTeam) {
+      this.youthTeam = newYouthTeam;
       this.players.forEach(player => { player.youthOptions = "" });
     }
+    return true;
   }
 
 

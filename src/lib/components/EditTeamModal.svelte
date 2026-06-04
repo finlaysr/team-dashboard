@@ -7,13 +7,16 @@
     }: { showModal: boolean; currentName: string } = $props();
     let dialog: HTMLDialogElement | null = $state(null);
 
-    let newName: string = $state(currentName);
+    let newName: string = $state("");
     let newYouthTeam: boolean = $state(teams.currentTeam?.youthTeam || false);
+    let showWarning: boolean = $state(false);
 
     $effect(() => {
         if (showModal) {
             newName = currentName;
             newYouthTeam = teams.currentTeam?.youthTeam || false;
+            showWarning = false;
+
             dialog?.showModal();
         }
     });
@@ -30,9 +33,14 @@
     <form
         onsubmit={(e) => {
             e.preventDefault();
-            teams.currentTeam?.updateTeam(newName.trim(), newYouthTeam);
-            showModal = false;
-            dialog?.close();
+            showWarning = !teams.currentTeam?.updateTeam(
+                newName.trim(),
+                newYouthTeam,
+            );
+            if (!showWarning) {
+                showModal = false;
+                dialog?.close();
+            }
         }}
     >
         <p>Edit Team Name:</p>
@@ -43,8 +51,17 @@
             >
         </p>
         <div style="margin-top: 1rem;">
-            <button onclick={() => dialog?.close()}>Cancel</button>
+            <button type="button" onclick={() => dialog?.close()}>Cancel</button
+            >
             <button type="submit" class="primary">Save Changes</button>
         </div>
+        {#if showWarning}
+            <p
+                style="color: red; margin-top: 1rem; width: 100%; text-align: center;"
+            >
+                Could not update team.<br />
+                Check that this team name is not already used.
+            </p>
+        {/if}
     </form>
 </dialog>

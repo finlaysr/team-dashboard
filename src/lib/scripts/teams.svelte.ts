@@ -27,13 +27,14 @@ class Teams {
     }
   }
 
-  addTeam(name: string, subteams: string[], youthTeam: boolean) {
-    if (this.teams.find(t => t.name == name)) { return };
+  addTeam(name: string, subteams: string[], youthTeam: boolean): boolean {
+    if (this.teams.find(t => t.name == name)) { return false };
     this.teams.push(new Team(name, subteams, youthTeam));
     this.currentTeam = this.teams[this.teams.length - 1];
+    return true;
   }
 
-  deleteTeam(team: Team) {
+  deleteTeam(team: Team): boolean {
     if (this.teams.includes(team)) {
       this.teams.splice(this.teams.indexOf(team), 1);
       if (this.teams.length > 0) {
@@ -41,7 +42,9 @@ class Teams {
       } else {
         this.currentTeam = null;
       }
+      return true;
     }
+    return false;
   }
 
   saveToStorage() {

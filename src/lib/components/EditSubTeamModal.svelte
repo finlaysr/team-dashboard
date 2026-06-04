@@ -7,12 +7,15 @@
     }: { showModal: boolean; subTeamToEdit: string } = $props();
     let dialog: HTMLDialogElement | null = $state(null);
 
-    let newName: string = $state(subTeamToEdit);
+    let newName: string = $state("");
+    let showWarning: boolean = $state(false);
 
     $effect(() => {
         if (showModal) {
-            dialog?.showModal();
             newName = subTeamToEdit;
+            showWarning = false;
+
+            dialog?.showModal();
         }
     });
 
@@ -39,19 +42,33 @@
     <form
         onsubmit={(e) => {
             e.preventDefault();
-            teams.currentTeam?.editSubteam(subTeamToEdit, newName.trim());
-            dialog?.close();
+            showWarning = !teams.currentTeam?.editSubteam(
+                subTeamToEdit,
+                newName.trim(),
+            );
+            if (!showWarning) {
+                dialog?.close();
+            }
         }}
     >
         <p>Edit Sub Team Name:</p>
         <input type="text" required bind:value={newName} />
 
         <div style="margin-top: 1rem;">
-            <button onclick={() => dialog?.close()}>Cancel</button>
+            <button type="button" onclick={() => dialog?.close()}>Cancel</button
+            >
             <button class="danger" onclick={deleteSubTeam}>
                 Delete Sub Team
             </button>
             <button type="submit" class="primary">Save Changes</button>
         </div>
+        {#if showWarning}
+            <p
+                style="color: red; margin-top: 1rem; width: 100%; text-align: center;"
+            >
+                Could not update sub team.<br />
+                Check that this sub team name is not aleady used.
+            </p>
+        {/if}
     </form>
 </dialog>

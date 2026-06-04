@@ -9,22 +9,25 @@
     }: { showModal: boolean; playerToEdit: Player } = $props();
     let dialog: HTMLDialogElement | null = $state(null);
 
-    let newName: string = $state(playerToEdit.name);
-    let newMembership: string = $state(playerToEdit.membershipNum);
-    let newPosition: Position = $state(playerToEdit.position);
-    let newSubteam: string = $state(playerToEdit.subteam);
-    let newNamed: boolean = $state(playerToEdit.named);
-    let newYouthOptions: string = $state(playerToEdit.youthOptions);
+    let newName: string = $state("");
+    let newMembership: string = $state("");
+    let newPosition: Position = $state(Position.ANY);
+    let newSubteam: string = $state("");
+    let newNamed: boolean = $state(false);
+    let newYouthOptions: string = $state("");
+    let showWarning: boolean = $state(false);
 
     $effect(() => {
         if (showModal) {
-            dialog?.showModal();
             newName = playerToEdit.name;
             newMembership = playerToEdit.membershipNum;
             newPosition = playerToEdit.position;
             newSubteam = playerToEdit.subteam;
             newNamed = playerToEdit.named;
             newYouthOptions = playerToEdit.youthOptions;
+            showWarning = false;
+
+            dialog?.showModal();
         }
     });
 </script>
@@ -40,7 +43,7 @@
     <form
         onsubmit={(e) => {
             e.preventDefault();
-            teams.currentTeam?.updatePlayer(
+            showWarning = !teams.currentTeam?.updatePlayer(
                 playerToEdit,
                 newName.trim(),
                 newMembership.trim(),
@@ -49,8 +52,11 @@
                 newNamed,
                 newYouthOptions.trim(),
             );
-            dialog?.close();
-            showModal = false;
+            console.log("Update result:", !showWarning);
+            if (!showWarning) {
+                dialog?.close();
+                showModal = false;
+            }
         }}
     >
         <p>Player Name:</p>
@@ -89,8 +95,17 @@
             </select>
         {/if}
         <div style="margin-top: 1rem;">
-            <button onclick={() => dialog?.close()}>Cancel</button>
+            <button type="button" onclick={() => dialog?.close()}>Cancel</button
+            >
             <button type="submit" class="primary">Confirm</button>
         </div>
+        {#if showWarning}
+            <p
+                style="color: red; margin-top: 1rem; width: 100%; text-align: center;"
+            >
+                Could not update player.<br />
+                Check that this player name is not aleady used.
+            </p>
+        {/if}
     </form>
 </dialog>

@@ -5,17 +5,20 @@
     let dialog: HTMLDialogElement | null = $state(null);
 
     let teamName: string = $state("");
-    let subTeams: string[] = $state(["First Team"]);
+    let subTeams: string[] = $state([]);
     let subTeamCount = $state(1);
     let youthTeam: boolean = $state(false);
+    let showWarning: boolean = $state(false);
 
     $effect(() => {
         if (showModal) {
-            dialog?.showModal();
             subTeamCount = 1;
             teamName = "";
             subTeams = ["First Team"];
             youthTeam = false;
+            showWarning = false;
+
+            dialog?.showModal();
         }
     });
 </script>
@@ -31,8 +34,10 @@
     <form
         onsubmit={(e) => {
             e.preventDefault();
-            teams.addTeam(teamName, subTeams, youthTeam);
-            dialog?.close();
+            showWarning = !teams.addTeam(teamName, subTeams, youthTeam);
+            if (!showWarning) {
+                dialog?.close();
+            }
         }}
     >
         <p>Team Name:</p>
@@ -65,9 +70,18 @@
             >
         </p>
         <div style="margin-top: 1rem;">
-            <button onclick={() => dialog?.close()}>Cancel</button>
+            <button type="button" onclick={() => dialog?.close()}>Cancel</button
+            >
             <button type="submit" class="primary">Create!</button>
         </div>
+        {#if showWarning}
+            <p
+                style="color: red; margin-top: 1rem; width: 100%; text-align: center;"
+            >
+                Could not create team.<br />
+                Check that this team name is not already used.
+            </p>
+        {/if}
     </form>
 </dialog>
 

@@ -9,9 +9,11 @@
     let playerName: string = $state("");
     let membershipNum: string = $state("");
     let position: Position = $state(Position.ANY);
-    let subTeams: string = $state(team.subteams[0] || "");
+    let subTeams: string = $state("");
     let namedPlayer: boolean = $state(false);
     let youthOptions: string = $state("");
+    let showWarning: boolean = $state(false);
+
     $effect(() => {
         if (showModal) {
             dialog?.showModal();
@@ -21,6 +23,7 @@
             subTeams = team.subteams[0] || "";
             namedPlayer = false;
             youthOptions = "";
+            showWarning = false;
         }
     });
 </script>
@@ -36,7 +39,7 @@
     <form
         onsubmit={(e) => {
             e.preventDefault();
-            team.addPlayer(
+            showWarning = !team.addPlayer(
                 new Player(
                     playerName.trim(),
                     membershipNum.trim(),
@@ -46,7 +49,9 @@
                     youthOptions.trim(),
                 ),
             );
-            dialog?.close();
+            if (!showWarning) {
+                dialog?.close();
+            }
         }}
     >
         <p>Player Name:</p>
@@ -85,8 +90,17 @@
             </select>
         {/if}
         <div style="margin-top: 1rem;">
-            <button onclick={() => dialog?.close()}>Cancel</button>
+            <button type="button" onclick={() => dialog?.close()}>Cancel</button
+            >
             <button type="submit" class="primary">Create!</button>
         </div>
+        {#if showWarning}
+            <p
+                style="color: red; margin-top: 1rem; width: 100%; text-align: center;"
+            >
+                Could not create player.<br />
+                Check that this player name is not already used.
+            </p>
+        {/if}
     </form>
 </dialog>
