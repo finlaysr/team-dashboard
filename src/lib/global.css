@@ -90,3 +90,24 @@ select {
     padding: 0;
     margin: 0;
 }
+
+table,
+th,
+td {
+    border: 1px solid #ccc;
+}
+
+td,
+tr {
+    padding: 0.5rem;
+}
+
+thead {
+    background-color: #eee;
+    border-bottom: 2px solid #ccc;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}

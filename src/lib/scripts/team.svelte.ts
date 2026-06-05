@@ -1,20 +1,27 @@
 import { teams } from "$lib/scripts/teams.svelte";
-import { Match } from "$lib/scripts/match.svelte";
 import { Matches } from "$lib/scripts/matches.svelte";
 import type { SubTeamsInvloved } from "$lib/scripts/match.svelte";
 
 
 export class Team {
+  teamID: number = $state(-1);
   name: string = $state("");
-  readonly subteams: string[] = $state([]);
+  readonly subteams: SubTeam[] = $state([]);
   readonly players: Player[] = $state([]);
   youthTeam: boolean = $state(false);
+  private playerIndex: number = $state(0);
+  private subteamIndex: number = $state(0);
 
   private matches: Matches = $state(new Matches());
 
-  constructor(name: string, subteams: string[] = ["First Team"], youthTeam: boolean, players?: Player[], matches?: Matches) {
+  constructor(teamID: number, name: string, youthTeam: boolean, players?: Player[], matches?: Matches, subTeamNames?: string[], subteams?: SubTeam[]) {
+    this.teamID = teamID;
     this.name = name.trim();
-    this.subteams = subteams.map(s => s.trim()).filter(s => s.length > 0);
+    if (subTeamNames) {
+      subTeamNames.forEach(s => { this.addSubteam(s) });
+    } else if (subteams) {
+      subteams.forEach(s => { this.subteams.push(s) });
+    }
     this.youthTeam = youthTeam;
     if (players) {
       this.players = players;
@@ -26,6 +33,7 @@ export class Team {
 
   toJSON() {
     return {
+      teamID: $state.snapshot(this.teamID),
       name: $state.snapshot(this.name),
       subteams: $state.snapshot(this.subteams),
       players: $state.snapshot(this.players),
@@ -38,84 +46,89 @@ export class Team {
     let json = JSON.parse(data);
 
     return new Team(
+      json.teamID,
       json.name,
-      json.subteams,
       json.youthTeam,
       json.players.map((p: any) => Player.fromJSON(JSON.stringify(p))),
       Matches.fromJSON(
         json.matches ? JSON.stringify(json.matches) : null
-      )
+      ),
+      undefined, // Ignore subTeamNames as we have the subTeamIDs when loading
+      json.subteams
     );
   }
 
-  addPlayer(player: Player): boolean {
-    if (this.players.find(p => p.name === player.name)) { return false };
-    this.players.push(player);
+  addPlayer(name: string, membershipNum: string, position: Position, subTeamID: number, named: boolean, youthOptions: string): boolean {
+    if (this.players.find(p => p.name === name)) { return false };
+    this.players.push(new Player(this.playerIndex++, name, membershipNum, position, subTeamID, named, youthOptions));
     return true;
   }
 
-  deletePlayer(player: Player): boolean {
-    if (this.players.includes(player)) {
+  deletePlayer(playerID: number): boolean {
+    const player = this.players.find(p => p.playerID === playerID);
+    if (player) {
       this.players.splice(this.players.indexOf(player), 1);
       return true;
     }
     return false;
   }
 
-  updatePlayer(player: Player, newName?: string, newMembership?: string, newPosition?: Position, newSubteam?: string, newNamed?: boolean, newYouthOptions?: string): boolean {
-    let updated = this.players.find(p => p === player);
-    if (!updated) { return false };
+  updatePlayer(playerID: number, newName?: string, newMembership?: string, newPosition?: Position, newSubTeamID?: number, newNamed?: boolean, newYouthOptions?: string): boolean {
+    const player = this.players.find(p => p.playerID === playerID);
+    if (!player) { return false };
 
     if (newName !== undefined) {
       if (this.players.find(p => p.name === newName && p !== player)) { return false };
-      updated.name = newName.trim();
+      player.name = newName.trim();
     }
-    if (newMembership !== undefined) updated.membershipNum = newMembership.trim();
-    if (newPosition !== undefined) updated.position = newPosition;
-    if (newSubteam !== undefined) updated.subteam = newSubteam.trim();
-    if (newNamed !== undefined) updated.named = newNamed;
-    if (newYouthOptions !== undefined) updated.youthOptions = newYouthOptions.trim();
+    if (newMembership !== undefined) player.membershipNum = newMembership.trim();
+    if (newPosition !== undefined) player.position = newPosition;
+    if (newSubTeamID !== undefined) player.subTeamID = newSubTeamID;
+    if (newNamed !== undefined) player.named = newNamed;
+    if (newYouthOptions !== undefined) player.youthOptions = newYouthOptions.trim();
     return true;
   }
 
-  addSubteam(subteam: string): boolean {
-    subteam = subteam.trim();
-    if (this.subteams.includes(subteam) || subteam.length === 0) { return false };
-    this.subteams.push(subteam);
+  getPlayerByID(playerID: number): Player | undefined {
+    return this.players.find(p => p.playerID === playerID);
+  }
+
+  addSubteam(subteamName: string): boolean {
+    subteamName = subteamName.trim();
+    if (this.subteams.some(s => s.name === subteamName) || subteamName.length === 0) { return false };
+    this.subteams.push({ subTeamID: this.subteamIndex++, name: subteamName });
     return true;
   }
 
-  editSubteam(oldName: string, newName: string): boolean {
-    const index = this.subteams.indexOf(oldName);
-    if (this.subteams.find(s => s === newName && s !== oldName)) { return false };
-    if (index !== -1 && newName.trim().length > 0) {
-      this.subteams[index] = newName;
-      this.players.forEach(player => {
-        if (player.subteam === oldName) {
-          player.subteam = newName;
-        }
-      });
-      return true;
-    }
-    return false;
+  editSubteam(subTeamID: number, newName: string): boolean {
+    newName = newName.trim();
+    if (newName.length === 0) { return false };
+
+    const index = this.subteams.findIndex(s => s.subTeamID === subTeamID);
+    if (index === -1) { return false };
+
+    if (this.subteams.some(s => s !== this.subteams[index] && s.name === newName)) { return false };
+    this.subteams[index].name = newName;
+    return true;
   }
 
-  deleteSubteam(name: string): boolean {
-    const index = this.subteams.indexOf(name);
+  deleteSubteam(subTeamID: number): boolean {
+    const index = this.subteams.findIndex(s => s.subTeamID === subTeamID);
     if (index !== -1) {
       this.subteams.splice(index, 1);
-      this.players.forEach(player => {
-        if (player.subteam === name) {
-          player.subteam = "";
-        }
-      });
       return true;
     }
     return false;
   }
 
-  getSubteamPlayers(subteam: string, position: Position = Position.ANY): Player[] {
-    return this.players.filter(player => player.subteam === subteam && player.position === position);
+  getSubteamByID(subTeamID: number): SubTeam | undefined {
+    return this.subteams.find(s => s.subTeamID === subTeamID);
+  }
+
+  getSubteamPlayers(subTeamID: number, position: Position = Position.ANY): Player[] {
+    const subteam = this.subteams.find(s => s.subTeamID === subTeamID);
+    if (!subteam) { return []; }
+    return this.players.filter(player => player.subTeamID === subteam.subTeamID && (player.position === position || position === Position.ANY));
   }
 
   updateTeam(newName: string, newYouthTeam: boolean): boolean {
@@ -132,34 +145,42 @@ export class Team {
     return this.matches;
   }
 
-  addMatch(newDate: string, newPastSubteams: Map<Player, string>, subTeamsInvolved: SubTeamsInvloved[]): boolean {
-    return this.matches.addMatch(newDate, newPastSubteams, subTeamsInvolved);
+  addMatch(newDate: string, subTeamsInvolved: SubTeamsInvloved[]): boolean {
+    return this.matches.addMatch(newDate, subTeamsInvolved);
   }
 }
 
+export interface SubTeam {
+  subTeamID: number;
+  name: string;
+}
+
 export class Player {
+  playerID: number = $state(-1);
   name: string = $state("");
   membershipNum: string = $state("");
   position: Position = $state(Position.ANY);
-  subteam: string = $state("");
+  subTeamID: number = $state(-1);
   named: boolean = $state(false);
   youthOptions: string = $state("");
 
-  constructor(name: string, membershipNum: string, position: Position, subteam: string, named: boolean, youthOptions: string = "") {
+  constructor(playerID: number, name: string, membershipNum: string, position: Position, subTeamID: number, named: boolean, youthOptions: string = "") {
+    this.playerID = playerID;
     this.name = name.trim();
     this.membershipNum = membershipNum.trim();
     this.position = position;
-    this.subteam = subteam.trim();
+    this.subTeamID = subTeamID;
     this.named = named;
     this.youthOptions = youthOptions.trim();
   }
 
   toJSON() {
     return {
+      playerID: $state.snapshot(this.playerID),
       name: $state.snapshot(this.name),
       membershipNum: $state.snapshot(this.membershipNum),
       position: $state.snapshot(this.position),
-      subteam: $state.snapshot(this.subteam),
+      subTeamID: $state.snapshot(this.subTeamID),
       named: $state.snapshot(this.named),
       youthOptions: $state.snapshot(this.youthOptions)
     }
@@ -168,10 +189,11 @@ export class Player {
   static fromJSON(data: any): Player {
     let json = JSON.parse(data);
     return new Player(
+      json.playerID,
       json.name,
       json.membershipNum,
       json.position,
-      json.subteam,
+      json.subTeamID,
       json.named,
       json.youthOptions
     );
@@ -185,4 +207,3 @@ export enum Position {
   FWD = "Forward",
   ANY = "Any",
 }
-

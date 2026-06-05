@@ -12,7 +12,7 @@
     let newName: string = $state("");
     let newMembership: string = $state("");
     let newPosition: Position = $state(Position.ANY);
-    let newSubteam: string = $state("");
+    let newSubTeamID: number = $state(-1);
     let newNamed: boolean = $state(false);
     let newYouthOptions: string = $state("");
     let showWarning: boolean = $state(false);
@@ -22,7 +22,7 @@
             newName = playerToEdit.name;
             newMembership = playerToEdit.membershipNum;
             newPosition = playerToEdit.position;
-            newSubteam = playerToEdit.subteam;
+            newSubTeamID = playerToEdit.subTeamID;
             newNamed = playerToEdit.named;
             newYouthOptions = playerToEdit.youthOptions;
             showWarning = false;
@@ -44,11 +44,11 @@
         onsubmit={(e) => {
             e.preventDefault();
             showWarning = !teams.currentTeam?.updatePlayer(
-                playerToEdit,
+                playerToEdit.playerID,
                 newName.trim(),
                 newMembership.trim(),
                 newPosition,
-                newSubteam.trim(),
+                newSubTeamID,
                 newNamed,
                 newYouthOptions.trim(),
             );
@@ -72,9 +72,9 @@
             <option value={Position.FWD}>Forward</option>
         </select>
         <p>Sub Team:</p>
-        <select bind:value={newSubteam}>
+        <select bind:value={newSubTeamID}>
             {#each teams.currentTeam?.subteams as subteam}
-                <option value={subteam}>{subteam}</option>
+                <option value={subteam.subTeamID}>{subteam.name}</option>
             {/each}
             <option value="">Any</option>
         </select>

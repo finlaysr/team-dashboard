@@ -9,7 +9,7 @@
     let playerName: string = $state("");
     let membershipNum: string = $state("");
     let position: Position = $state(Position.ANY);
-    let subTeams: string = $state("");
+    let subTeamID: number = $state(0);
     let namedPlayer: boolean = $state(false);
     let youthOptions: string = $state("");
     let showWarning: boolean = $state(false);
@@ -20,7 +20,7 @@
             playerName = "";
             membershipNum = "";
             position = Position.ANY;
-            subTeams = team.subteams[0] || "";
+            subTeamID = team.subteams[0]?.subTeamID || 0;
             namedPlayer = false;
             youthOptions = "";
             showWarning = false;
@@ -40,14 +40,12 @@
         onsubmit={(e) => {
             e.preventDefault();
             showWarning = !team.addPlayer(
-                new Player(
-                    playerName.trim(),
-                    membershipNum.trim(),
-                    position,
-                    subTeams,
-                    namedPlayer,
-                    youthOptions.trim(),
-                ),
+                playerName.trim(),
+                membershipNum.trim(),
+                position,
+                subTeamID,
+                namedPlayer,
+                youthOptions.trim(),
             );
             if (!showWarning) {
                 dialog?.close();
@@ -67,11 +65,10 @@
             <option value={Position.FWD}>Forward</option>
         </select>
         <p>Sub Team:</p>
-        <select bind:value={subTeams}>
-            {#each team.subteams as subteam}
-                <option value={subteam}>{subteam}</option>
+        <select bind:value={subTeamID}>
+            {#each team.subteams as { name, subTeamID }}
+                <option value={subTeamID}>{name}</option>
             {/each}
-            <option value="">Any</option>
         </select>
         <br />
         <label>

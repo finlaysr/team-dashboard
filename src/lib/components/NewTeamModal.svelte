@@ -5,7 +5,7 @@
     let dialog: HTMLDialogElement | null = $state(null);
 
     let teamName: string = $state("");
-    let subTeams: string[] = $state([]);
+    let subTeamNames: string[] = $state([]);
     let subTeamCount = $state(1);
     let youthTeam: boolean = $state(false);
     let showWarning: boolean = $state(false);
@@ -14,7 +14,7 @@
         if (showModal) {
             subTeamCount = 1;
             teamName = "";
-            subTeams = ["First Team"];
+            subTeamNames = ["First Team"];
             youthTeam = false;
             showWarning = false;
 
@@ -34,7 +34,7 @@
     <form
         onsubmit={(e) => {
             e.preventDefault();
-            showWarning = !teams.addTeam(teamName, subTeams, youthTeam);
+            showWarning = !teams.addTeam(teamName, subTeamNames, youthTeam);
             if (!showWarning) {
                 dialog?.close();
             }
@@ -51,7 +51,7 @@
                     <input
                         type="text"
                         required={i === 0}
-                        bind:value={subTeams[i]}
+                        bind:value={subTeamNames[i]}
                     />
                     <br />
                 {/each}

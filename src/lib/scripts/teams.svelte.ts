@@ -1,11 +1,13 @@
 import { browser } from "$app/environment";
 import { Team } from "$lib/scripts/team.svelte"
+import type { SubTeam } from "$lib/scripts/team.svelte";
 
 const STORAGE_KEY = "teamsData";
 
 class Teams {
   teams: Team[] = $state([]);
   currentTeam: Team | null = $state(null);
+  private teamIndex: number = $state(0);
 
   loadFromStorage() {
     if (browser) {
@@ -27,15 +29,18 @@ class Teams {
     }
   }
 
-  addTeam(name: string, subteams: string[], youthTeam: boolean): boolean {
+  addTeam(name: string, subTeamNames: string[], youthTeam: boolean): boolean {
     if (this.teams.find(t => t.name == name)) { return false };
-    this.teams.push(new Team(name, subteams, youthTeam));
-    this.currentTeam = this.teams[this.teams.length - 1];
+
+    const newTeam = new Team(this.teamIndex++, name, youthTeam, undefined, undefined, subTeamNames, undefined);
+    this.teams.push(newTeam);
+    this.currentTeam = newTeam;
     return true;
   }
 
-  deleteTeam(team: Team): boolean {
-    if (this.teams.includes(team)) {
+  deleteTeam(teamID: number): boolean {
+    const team = this.teams.find(t => t.teamID === teamID);
+    if (team) {
       this.teams.splice(this.teams.indexOf(team), 1);
       if (this.teams.length > 0) {
         this.currentTeam = this.teams[0];

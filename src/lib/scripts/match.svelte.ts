@@ -1,32 +1,73 @@
-import type { Player } from "$lib/scripts/team.svelte";
+import type { Player, Position } from "$lib/scripts/team.svelte";
+import { teams } from "$lib/scripts/teams.svelte";
 
 export class Match {
-    private ID: number = $state(-1);
+    private matchID: number = $state(-1);
     private date: string = $state("");
-    private availability: Map<Player, Availability> = $state(new Map());
     private subTeamsInvolved: SubTeamsInvloved[] = $state([]);
-    private pastSubteams: Map<Player, string> = $state(new Map());
 
-    constructor(ID: number, date: string, pastSubteams: Map<Player, string>, subTeamsInvolved: SubTeamsInvloved[]) {
-        this.ID = ID;
+    private availability: Map<number, Availability> = $state(new Map());
+    private matchSubTeams: Map<number, number> = $state(new Map());
+    private matchPositions: Map<number, Position> = $state(new Map());
+
+    constructor(matchID: number, date: string, subTeamsInvolved: SubTeamsInvloved[], availability?: Map<number, Availability>, matchSubTeams?: Map<number, number>, matchPositions?: Map<number, Position>) {
+        function setDefaultSubteams(): Map<number, number> {
+            let map: Map<number, number> = new Map();
+            teams.currentTeam?.players.forEach((p) => {
+                map.set(p.playerID, p.subTeamID);
+            });
+            return map;
+        }
+
+        function setDefaultAvailability(): Map<number, Availability> {
+            let map: Map<number, Availability> = new Map();
+            teams.currentTeam?.players.forEach((p) => {
+                map.set(p.playerID, Availability.NO_REPLY);
+            });
+            return map;
+        }
+
+        function setDefaultPositions(): Map<number, Position> {
+            let map: Map<number, Position> = new Map();
+            teams.currentTeam?.players.forEach((p) => {
+                map.set(p.playerID, p.position);
+            });
+            return map;
+        }
+
+        this.matchID = matchID;
         this.date = date.trim();
-        this.pastSubteams = pastSubteams;
         this.subTeamsInvolved = subTeamsInvolved;
+        if (matchSubTeams) {
+            this.matchSubTeams = matchSubTeams;
+        } else {
+            this.matchSubTeams = setDefaultSubteams();
+        }
+        if (availability) {
+            this.availability = availability;
+        } else {
+            this.availability = setDefaultAvailability();
+        }
+        if (matchPositions) {
+            this.matchPositions = matchPositions;
+        } else {
+            this.matchPositions = setDefaultPositions();
+        }
     }
 
     setAvailability(player: Player, availability: Availability) {
-        this.availability.set(player, availability);
+        this.availability.set(player.playerID, availability);
     }
 
     get getID(): number {
-        return this.ID;
+        return this.matchID;
     }
 
     get getDate(): string {
         return this.date;
     }
 
-    get getAvailability(): Map<Player, Availability> {
+    get getAvailability(): Map<number, Availability> {
         return this.availability;
     }
 
@@ -34,27 +75,34 @@ export class Match {
         return this.subTeamsInvolved;
     }
 
-    get getPastSubteams(): Map<Player, string> {
-        return this.pastSubteams;
+    get getmatchSubTeams(): Map<number, number> {
+        return this.matchSubTeams;
+    }
+
+    get getMatchPositions(): Map<number, Position> {
+        return this.matchPositions;
     }
 
     toJSON() {
         return {
-            ID: $state.snapshot(this.ID),
+            matchID: $state.snapshot(this.matchID),
             date: $state.snapshot(this.date),
-            availability: Array.from($state.snapshot(this.availability).entries()),
             subTeamsInvolved: $state.snapshot(this.subTeamsInvolved),
-            pastSubteams: Array.from($state.snapshot(this.pastSubteams).entries()),
+            availability: Array.from($state.snapshot(this.availability).entries()),
+            matchSubTeams: Array.from($state.snapshot(this.matchSubTeams).entries()),
+            matchPositions: Array.from($state.snapshot(this.matchPositions).entries()),
         }
     }
 
     static fromJSON(data: string): Match {
         let json = JSON.parse(data);
         return new Match(
-            json.ID,
+            json.matchID,
             json.date,
-            new Map(json.pastSubteams),
-            json.subTeamsInvolved
+            json.subTeamsInvolved,
+            new Map(json.availability),
+            new Map(json.matchSubTeams),
+            new Map(json.matchPositions)
         );
     }
 }
@@ -68,6 +116,6 @@ export enum Availability {
 }
 
 export interface SubTeamsInvloved {
-    "subteam": string;
+    "subTeamID": number;
     "description": string
 }

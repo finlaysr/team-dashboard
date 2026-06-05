@@ -3,8 +3,8 @@
 
     let {
         showModal = $bindable(),
-        subTeamToEdit,
-    }: { showModal: boolean; subTeamToEdit: string } = $props();
+        subTeamIDToEdit,
+    }: { showModal: boolean; subTeamIDToEdit: number } = $props();
     let dialog: HTMLDialogElement | null = $state(null);
 
     let newName: string = $state("");
@@ -12,7 +12,8 @@
 
     $effect(() => {
         if (showModal) {
-            newName = subTeamToEdit;
+            newName =
+                teams.currentTeam?.getSubteamByID(subTeamIDToEdit)?.name || "";
             showWarning = false;
 
             dialog?.showModal();
@@ -22,10 +23,10 @@
     function deleteSubTeam() {
         if (
             window.confirm(
-                `Are you sure you want to delete the sub team "${subTeamToEdit}"? This action cannot be undone.`,
+                `Are you sure you want to delete the sub team "${teams.currentTeam?.getSubteamByID(subTeamIDToEdit)?.name}"? This action cannot be undone.`,
             )
         ) {
-            teams.currentTeam?.deleteSubteam(subTeamToEdit);
+            teams.currentTeam?.deleteSubteam(subTeamIDToEdit);
             dialog?.close();
         }
     }
@@ -43,11 +44,12 @@
         onsubmit={(e) => {
             e.preventDefault();
             showWarning = !teams.currentTeam?.editSubteam(
-                subTeamToEdit,
+                subTeamIDToEdit,
                 newName.trim(),
             );
             if (!showWarning) {
                 dialog?.close();
+                showModal = false;
             }
         }}
     >

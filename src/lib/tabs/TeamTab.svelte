@@ -10,14 +10,14 @@
     let showNewSubTeamModal: boolean = $state(false);
     let showNewPlayerModal: boolean = $state(false);
     let showEditSubTeamModal: boolean = $state(false);
-    let subTeamToEdit: string = $state("");
+    let subTeamIDToEdit: number = $state(-1);
     let showEditTeamModal: boolean = $state(false);
     let showEditPlayerModal: boolean = $state(false);
     let playerToEdit: Player | null = $state(null);
 </script>
 
 {#if teams.currentTeam}
-    <EditSubTeamModal bind:showModal={showEditSubTeamModal} {subTeamToEdit} />
+    <EditSubTeamModal bind:showModal={showEditSubTeamModal} {subTeamIDToEdit} />
     <NewSubTeamModal
         bind:showModal={showNewSubTeamModal}
         team={teams.currentTeam}
@@ -58,15 +58,15 @@
         </div>
 
         <div style="display: flex; gap: 2rem; align-items: center;">
-            {#each teams.currentTeam?.subteams as name (name)}
+            {#each teams.currentTeam?.subteams as subteam (subteam.subTeamID)}
                 <button
                     class="subteams"
                     onclick={() => {
-                        subTeamToEdit = name;
+                        subTeamIDToEdit = subteam.subTeamID;
                         showEditSubTeamModal = true;
                     }}
                 >
-                    {name}
+                    {subteam.name}
                 </button>
             {/each}
             <div></div>
@@ -86,7 +86,7 @@
             </button>
         </div>
 
-        <table style="border-collapse: collapse; width: 100%;">
+        <table>
             <thead>
                 <tr>
                     <th>Name</th>
@@ -104,12 +104,15 @@
             </thead>
 
             <tbody>
-                {#each teams.currentTeam?.players ?? [] as player (player.name)}
+                {#each teams.currentTeam?.players ?? [] as player (player.playerID)}
                     <tr>
                         <td> {player.name} </td>
                         <td> {player.membershipNum}</td>
                         <td> {player.position} </td>
-                        <td> {player.subteam} </td>
+                        <td>
+                            {teams.currentTeam?.getSubteamByID(player.subTeamID)
+                                ?.name}
+                        </td>
                         <td> {player.named ? "Yes" : "No"} </td>
                         <td> {player.youthOptions} </td>
                         <td>
@@ -129,7 +132,9 @@
                                             `Are you sure you want to delete the player "${player.name}"? This action cannot be undone.`,
                                         )
                                     ) {
-                                        teams.currentTeam?.deletePlayer(player);
+                                        teams.currentTeam?.deletePlayer(
+                                            player.playerID,
+                                        );
                                     }
                                 }}
                                 >Delete
@@ -162,7 +167,7 @@
                     `Are you sure you want to delete the team "${teams.currentTeam?.name}"? This action cannot be undone.`,
                 )
             ) {
-                teams.currentTeam && teams.deleteTeam(teams.currentTeam);
+                teams.currentTeam && teams.deleteTeam(teams.currentTeam.teamID);
             }
         }}
     >
@@ -171,16 +176,6 @@
 {/if}
 
 <style>
-    table,
-    th,
-    td {
-        border: 1px solid #ccc;
-    }
-    td,
-    tr {
-        padding: 0.5rem;
-    }
-
     .subteams {
         display: flex;
         gap: 0.5rem;
@@ -190,10 +185,5 @@
         border: 1px solid #ccc;
         border-radius: 0.25rem;
         background-color: #fff;
-    }
-
-    thead {
-        background-color: #eee;
-        border-bottom: 2px solid #ccc;
     }
 </style>
