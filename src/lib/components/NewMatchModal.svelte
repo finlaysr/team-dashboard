@@ -1,8 +1,7 @@
 <script lang="ts">
     import type { SubTeamsInvloved } from "$lib/scripts/match.svelte";
-    import { matches } from "$lib/scripts/matches.svelte";
-    import type { Player, Position } from "$lib/scripts/team.svelte";
     import { teams } from "$lib/scripts/teams.svelte";
+    import type { Player, Position } from "$lib/scripts/team.svelte";
     let { showModal = $bindable() }: { showModal: boolean } = $props();
     let dialog: HTMLDialogElement | null = $state(null);
 
@@ -28,16 +27,22 @@
     }
 
     function getSubTeamsInvolved(): SubTeamsInvloved[] {
-        let values: SubTeamsInvloved[] = [];
-        subTeamsCheckboxes
+        if (teams.currentTeam == null) {
+            return [];
+        }
+        console.log("chekcboxes: ", $state.snapshot(subTeamsCheckboxes));
+        console.log("Desc: ", $state.snapshot(subTeamsDesc));
+        let values = subTeamsCheckboxes
             .entries()
             .filter(([_, v]) => v)
-            .forEach(([i, _]) => {
+            .map(([i, _]) => {
                 return {
-                    subteam: teams.currentTeam?.subteams[i],
-                    matchName: subTeamsDesc[i].trim(),
+                    subteam: teams.currentTeam!.subteams[i],
+                    description: subTeamsDesc[i].trim(),
                 };
-            });
+            })
+            .toArray();
+        console.log("Subteams: ", JSON.stringify(values));
         return values;
     }
 </script>
@@ -53,7 +58,7 @@
     <form
         onsubmit={(e) => {
             e.preventDefault();
-            showWarning = !matches.addMatch(
+            showWarning = !teams.currentTeam?.addMatch(
                 date,
                 getPastSubteams(),
                 getSubTeamsInvolved(),

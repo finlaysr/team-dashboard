@@ -56,4 +56,3 @@ class Teams {
 }
 
 export const teams = new Teams();
-

@@ -1,4 +1,8 @@
 import { teams } from "$lib/scripts/teams.svelte";
+import { Match } from "$lib/scripts/match.svelte";
+import { Matches } from "$lib/scripts/matches.svelte";
+import type { SubTeamsInvloved } from "$lib/scripts/match.svelte";
+
 
 export class Team {
   name: string = $state("");
@@ -6,12 +10,17 @@ export class Team {
   readonly players: Player[] = $state([]);
   youthTeam: boolean = $state(false);
 
-  constructor(name: string, subteams: string[] = ["First Team"], youthTeam: boolean, players?: Player[]) {
+  private matches: Matches = $state(new Matches());
+
+  constructor(name: string, subteams: string[] = ["First Team"], youthTeam: boolean, players?: Player[], matches?: Matches) {
     this.name = name.trim();
     this.subteams = subteams.map(s => s.trim()).filter(s => s.length > 0);
     this.youthTeam = youthTeam;
     if (players) {
       this.players = players;
+    }
+    if (matches) {
+      this.matches = matches;
     }
   }
 
@@ -20,17 +29,22 @@ export class Team {
       name: $state.snapshot(this.name),
       subteams: $state.snapshot(this.subteams),
       players: $state.snapshot(this.players),
-      youthTeam: $state.snapshot(this.youthTeam)
+      youthTeam: $state.snapshot(this.youthTeam),
+      matches: $state.snapshot(this.matches),
     }
   }
 
   static fromJSON(data: string): Team {
     let json = JSON.parse(data);
+
     return new Team(
       json.name,
       json.subteams,
       json.youthTeam,
-      json.players.map((p: any) => Player.fromJSON(JSON.stringify(p)))
+      json.players.map((p: any) => Player.fromJSON(JSON.stringify(p))),
+      Matches.fromJSON(
+        json.matches ? JSON.stringify(json.matches) : null
+      )
     );
   }
 
@@ -114,7 +128,13 @@ export class Team {
     return true;
   }
 
+  get getMatches(): Matches {
+    return this.matches;
+  }
 
+  addMatch(newDate: string, newPastSubteams: Map<Player, string>, subTeamsInvolved: SubTeamsInvloved[]): boolean {
+    return this.matches.addMatch(newDate, newPastSubteams, subTeamsInvolved);
+  }
 }
 
 export class Player {

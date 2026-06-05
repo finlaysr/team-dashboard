@@ -1,5 +1,4 @@
 import type { Player } from "$lib/scripts/team.svelte";
-let counter = 0;
 
 export class Match {
     private ID: number = $state(-1);
@@ -8,8 +7,8 @@ export class Match {
     private subTeamsInvolved: SubTeamsInvloved[] = $state([]);
     private pastSubteams: Map<Player, string> = $state(new Map());
 
-    constructor(date: string, pastSubteams: Map<Player, string>, subTeamsInvolved: SubTeamsInvloved[]) {
-        this.ID = counter++;
+    constructor(ID: number, date: string, pastSubteams: Map<Player, string>, subTeamsInvolved: SubTeamsInvloved[]) {
+        this.ID = ID;
         this.date = date.trim();
         this.pastSubteams = pastSubteams;
         this.subTeamsInvolved = subTeamsInvolved;
@@ -37,6 +36,26 @@ export class Match {
 
     get getPastSubteams(): Map<Player, string> {
         return this.pastSubteams;
+    }
+
+    toJSON() {
+        return {
+            ID: $state.snapshot(this.ID),
+            date: $state.snapshot(this.date),
+            availability: Array.from($state.snapshot(this.availability).entries()),
+            subTeamsInvolved: $state.snapshot(this.subTeamsInvolved),
+            pastSubteams: Array.from($state.snapshot(this.pastSubteams).entries()),
+        }
+    }
+
+    static fromJSON(data: string): Match {
+        let json = JSON.parse(data);
+        return new Match(
+            json.ID,
+            json.date,
+            new Map(json.pastSubteams),
+            json.subTeamsInvolved
+        );
     }
 }
 
