@@ -32,19 +32,26 @@
 
     <div id="header">
         <h1>Team Dashboard</h1>
-        {#if teams.teams.length > 0}
-            <p style="padding: 0rem; margin: 0;">Current Team:</p>
-            <form>
-                <select bind:value={teams.currentTeam}>
-                    {#each teams.teams as team}
-                        <option value={team}>{team.name}</option>
-                    {/each}
-                </select>
-            </form>
-            <button onclick={() => (showNewTeamModal = true)} class="primary">
-                Create New Team
-            </button>
-        {/if}
+        <div
+            style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;"
+        >
+            {#if teams.teams.length > 0}
+                <p style="padding: 0rem; margin: 0;">Current Team:</p>
+                <form>
+                    <select bind:value={teams.currentTeam}>
+                        {#each teams.teams as team}
+                            <option value={team}>{team.name}</option>
+                        {/each}
+                    </select>
+                </form>
+                <button
+                    onclick={() => (showNewTeamModal = true)}
+                    class="primary"
+                >
+                    Create New Team
+                </button>
+            {/if}
+        </div>
     </div>
 
     {#if loaded}
@@ -89,6 +96,7 @@
         display: flex;
         width: 100%;
         background-color: #eee;
+        flex-wrap: wrap;
     }
 
     .tabs button {
@@ -112,10 +120,48 @@
     #header {
         background-color: #083e00;
         color: white;
-        padding: 0.5rem 1rem;
+        padding: 1.5rem 1.5rem;
         display: flex;
         gap: 2rem;
         align-items: center;
+        flex-wrap: wrap;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    @media (max-width: 768px) {
+        #header {
+            padding: 1rem;
+            gap: 1rem;
+        }
+
+        #header h1 {
+            font-size: 1.5rem;
+        }
+
+        #header select {
+            font-size: 0.9rem;
+            padding: 0.2rem;
+        }
+    }
+
+    #header h1 {
+        margin: 0;
+        padding: 0;
+    }
+
+    #header p {
+        margin: 0;
+        padding: 0;
+    }
+
+    #header button {
+        margin: 0;
+    }
+
+    #header select {
+        padding: 0.25rem;
+        font-size: 1rem;
     }
 
     select {

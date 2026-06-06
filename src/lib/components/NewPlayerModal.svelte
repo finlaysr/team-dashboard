@@ -54,8 +54,10 @@
     >
         <p>Player Name:</p>
         <input type="text" required bind:value={playerName} />
+
         <p>Membership Number:</p>
         <input type="text" bind:value={membershipNum} />
+
         <p>Position:</p>
         <select bind:value={position}>
             <option value={Position.ANY}>Any</option>
@@ -64,6 +66,7 @@
             <option value={Position.CEN}>Center</option>
             <option value={Position.FWD}>Forward</option>
         </select>
+
         <p>Sub Team:</p>
         <select bind:value={subTeamID}>
             {#each team.subteams as { name, subTeamID }}
@@ -71,14 +74,16 @@
             {/each}
         </select>
         <br />
-        <label>
-            <input type="checkbox" bind:checked={namedPlayer} />
-            Named Player
-        </label>
+
         {#if team.youthTeam}
             <p>Date of Birth:</p>
             <input type="date" bind:value={youthOptions} />
         {:else}
+            <label>
+                <input type="checkbox" bind:checked={namedPlayer} />
+                Named Player
+            </label>
+
             <p>Youth Player or Helmet Waiver:</p>
             <select bind:value={youthOptions}>
                 <option value="">Neither</option>
@@ -86,11 +91,13 @@
                 <option value="HW">Helmet Waiver</option>
             </select>
         {/if}
+
         <div style="margin-top: 1rem;">
             <button type="button" onclick={() => dialog?.close()}>Cancel</button
             >
             <button type="submit" class="primary">Create!</button>
         </div>
+
         {#if showWarning}
             <p
                 style="color: red; margin-top: 1rem; width: 100%; text-align: center;"

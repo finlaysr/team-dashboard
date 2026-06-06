@@ -6,15 +6,15 @@ export class Matches {
   currentMatch: Match | null = $state(null);
   private matchIndex: number = $state(0);
 
-  constructor(matches?: Match[], currentMatch?: Match | null, matchCount?: number) {
+  constructor(matches?: Match[], currentMatch?: Match | null, matchIndex?: number) {
     if (matches) {
       this.matches = matches;
     }
     if (currentMatch) {
       this.currentMatch = currentMatch;
     }
-    if (matchCount !== undefined) {
-      this.matchIndex = matchCount;
+    if (matchIndex !== undefined) {
+      this.matchIndex = matchIndex;
     }
   }
 
@@ -23,7 +23,6 @@ export class Matches {
   }
 
   addMatch(newDate: string, subTeamsInvolved: SubTeamsInvloved[]): boolean {
-    console.log("Adding new match: ", newDate);
     this.matches.push(new Match(this.matchIndex++, newDate.trim(), subTeamsInvolved));
     this.currentMatch = this.matches[this.matches.length - 1];
     return true;

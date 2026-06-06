@@ -14,9 +14,11 @@ export class Team {
 
   private matches: Matches = $state(new Matches());
 
-  constructor(teamID: number, name: string, youthTeam: boolean, players?: Player[], matches?: Matches, subTeamNames?: string[], subteams?: SubTeam[]) {
+  constructor(teamID: number, name: string, youthTeam: boolean, playerIndex: number = 0, subteamIndex: number = 0, players?: Player[], matches?: Matches, subTeamNames?: string[], subteams?: SubTeam[]) {
     this.teamID = teamID;
     this.name = name.trim();
+    this.playerIndex = playerIndex;
+    this.subteamIndex = subteamIndex;
     if (subTeamNames) {
       subTeamNames.forEach(s => { this.addSubteam(s) });
     } else if (subteams) {
@@ -38,6 +40,8 @@ export class Team {
       subteams: $state.snapshot(this.subteams),
       players: $state.snapshot(this.players),
       youthTeam: $state.snapshot(this.youthTeam),
+      playerIndex: $state.snapshot(this.playerIndex),
+      subteamIndex: $state.snapshot(this.subteamIndex),
       matches: $state.snapshot(this.matches),
     }
   }
@@ -49,6 +53,8 @@ export class Team {
       json.teamID,
       json.name,
       json.youthTeam,
+      json.playerIndex,
+      json.subteamIndex,
       json.players.map((p: any) => Player.fromJSON(JSON.stringify(p))),
       Matches.fromJSON(
         json.matches ? JSON.stringify(json.matches) : null

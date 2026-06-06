@@ -20,8 +20,8 @@
                 check availability.
             </p>
             <p>
-                Any changes to player sub teams you make here won't affect the
-                main team list.
+                Any changes made here to player sub teams or positions won't
+                affect the main team list.
             </p>
             <p>To get started, create your first match day!</p>
             <button class="primary" onclick={() => (showNewMatchModal = true)}>
@@ -57,54 +57,47 @@
                 </h4>
             {/each}
 
-            {#each currentMatch?.getmatchSubTeams.keys() as player (player)}
-                <p>
-                    {teams.currentTeam?.getPlayerByID(player)?.name} - {currentMatch?.getmatchSubTeams.get(
-                        player,
-                    )}
-                    - {currentMatch?.getAvailability.get(player)}
-                </p>
-            {/each}
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Player</th>
-                        <th>Sub Team</th>
-                        <th>Position</th>
-                        <th>Availability</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {#each currentMatch?.getmatchSubTeams.keys() as playerID (playerID)}
+            <div class="scroll">
+                <table>
+                    <thead>
                         <tr>
-                            <td
-                                >{teams.currentTeam?.getPlayerByID(playerID)
-                                    ?.name}</td
-                            >
-                            <td
-                                >{teams.currentTeam?.getSubteamByID(
-                                    currentMatch?.getmatchSubTeams.get(
-                                        playerID,
-                                    )!,
-                                )?.name}</td
-                            >
-                            <td
-                                >{currentMatch?.getMatchPositions.get(
-                                    playerID,
-                                )}</td
-                            >
-                            <td
-                                >{currentMatch?.getAvailability.get(
-                                    playerID,
-                                )}</td
-                            >
+                            <th>Player</th>
+                            <th>Sub Team</th>
+                            <th>Position</th>
+                            <th>Availability</th>
+                            <th>Actions</th>
                         </tr>
-                    {/each}
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        {#each currentMatch?.getmatchSubTeams.keys() as playerID (playerID)}
+                            <tr>
+                                <td
+                                    >{teams.currentTeam?.getPlayerByID(playerID)
+                                        ?.name}</td
+                                >
+                                <td
+                                    >{teams.currentTeam?.getSubteamByID(
+                                        currentMatch?.getmatchSubTeams.get(
+                                            playerID,
+                                        )!,
+                                    )?.name}</td
+                                >
+                                <td
+                                    >{currentMatch?.getMatchPositions.get(
+                                        playerID,
+                                    )}</td
+                                >
+                                <td
+                                    >{currentMatch?.getAvailability.get(
+                                        playerID,
+                                    )}</td
+                                >
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            </div>
 
             <button
                 class="danger"
@@ -121,6 +114,7 @@
                         }
                     }
                 }}
+                style="margin-top: 1rem;"
             >
                 Delete Match Day
             </button>

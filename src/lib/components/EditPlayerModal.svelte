@@ -79,14 +79,14 @@
             <option value="">Any</option>
         </select>
         <br />
-        <label>
-            <input type="checkbox" bind:checked={newNamed} />
-            Named Player
-        </label>
         {#if teams.currentTeam?.youthTeam}
             <p>Date of Birth:</p>
             <input type="date" bind:value={newYouthOptions} />
         {:else}
+            <label>
+                <input type="checkbox" bind:checked={newNamed} />
+                Named Player
+            </label>
             <p>Youth Player or Helmet Waiver:</p>
             <select bind:value={newYouthOptions}>
                 <option value="">Neither</option>

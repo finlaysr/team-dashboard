@@ -1,6 +1,5 @@
 import { browser } from "$app/environment";
 import { Team } from "$lib/scripts/team.svelte"
-import type { SubTeam } from "$lib/scripts/team.svelte";
 
 const STORAGE_KEY = "teamsData";
 
@@ -24,6 +23,10 @@ class Teams {
           console.error("Failed to parse teams data from storage:", e);
         }
       }
+      let storedIndex = localStorage.getItem("teamIndex");
+      if (storedIndex) {
+        this.teamIndex = parseInt(storedIndex);
+      }
     } else {
       console.warn("Not ready to load teams from storage!");
     }
@@ -32,7 +35,7 @@ class Teams {
   addTeam(name: string, subTeamNames: string[], youthTeam: boolean): boolean {
     if (this.teams.find(t => t.name == name)) { return false };
 
-    const newTeam = new Team(this.teamIndex++, name, youthTeam, undefined, undefined, subTeamNames, undefined);
+    const newTeam = new Team(this.teamIndex++, name, youthTeam, 0, 0, undefined, undefined, subTeamNames, undefined);
     this.teams.push(newTeam);
     this.currentTeam = newTeam;
     return true;
@@ -56,6 +59,7 @@ class Teams {
     if (browser) {
       let data = JSON.stringify($state.snapshot(this.teams));
       localStorage.setItem(STORAGE_KEY, data);
+      localStorage.setItem("teamIndex", this.teamIndex.toString());
     }
   }
 }

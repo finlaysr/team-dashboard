@@ -85,65 +85,69 @@
                 New Player
             </button>
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Membership No.</th>
-                    <th>Position</th>
-                    <th>Sub Team</th>
-                    <th>Named Player</th>
-                    {#if teams.currentTeam?.youthTeam}
-                        <th>Date of Birth</th>
-                    {:else}
-                        <th>Youth Player (Y) or Helmet Waiver (HW)</th>
-                    {/if}
-                    <th>Actions</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {#each teams.currentTeam?.players ?? [] as player (player.playerID)}
+        <div class="scroll">
+            <table>
+                <thead>
                     <tr>
-                        <td> {player.name} </td>
-                        <td> {player.membershipNum}</td>
-                        <td> {player.position} </td>
-                        <td>
-                            {teams.currentTeam?.getSubteamByID(player.subTeamID)
-                                ?.name}
-                        </td>
-                        <td> {player.named ? "Yes" : "No"} </td>
-                        <td> {player.youthOptions} </td>
-                        <td>
-                            <button
-                                onclick={() => {
-                                    playerToEdit = player;
-                                    showEditPlayerModal = true;
-                                }}
-                            >
-                                Edit
-                            </button>
-                            <button
-                                class="danger"
-                                onclick={() => {
-                                    if (
-                                        window.confirm(
-                                            `Are you sure you want to delete the player "${player.name}"? This action cannot be undone.`,
-                                        )
-                                    ) {
-                                        teams.currentTeam?.deletePlayer(
-                                            player.playerID,
-                                        );
-                                    }
-                                }}
-                                >Delete
-                            </button></td
-                        >
+                        <th>Name</th>
+                        <th>Membership No.</th>
+                        <th>Position</th>
+                        <th>Sub Team</th>
+                        {#if teams.currentTeam?.youthTeam}
+                            <th>Date of Birth</th>
+                        {:else}
+                            <th>Named Player</th>
+                            <th>Youth Player (Y) or Helmet Waiver (HW)</th>
+                        {/if}
+                        <th>Actions</th>
                     </tr>
-                {/each}
-            </tbody>
-        </table>
+                </thead>
+
+                <tbody>
+                    {#each teams.currentTeam?.players ?? [] as player (player.playerID)}
+                        <tr>
+                            <td> {player.name} </td>
+                            <td> {player.membershipNum}</td>
+                            <td> {player.position} </td>
+                            <td>
+                                {teams.currentTeam?.getSubteamByID(
+                                    player.subTeamID,
+                                )?.name}
+                            </td>
+                            {#if !teams.currentTeam?.youthTeam}
+                                <td> {player.named ? "Yes" : "No"} </td>
+                            {/if}
+                            <td> {player.youthOptions} </td>
+                            <td>
+                                <button
+                                    onclick={() => {
+                                        playerToEdit = player;
+                                        showEditPlayerModal = true;
+                                    }}
+                                >
+                                    Edit
+                                </button>
+                                <button
+                                    class="danger"
+                                    onclick={() => {
+                                        if (
+                                            window.confirm(
+                                                `Are you sure you want to delete the player "${player.name}"? This action cannot be undone.`,
+                                            )
+                                        ) {
+                                            teams.currentTeam?.deletePlayer(
+                                                player.playerID,
+                                            );
+                                        }
+                                    }}
+                                    >Delete
+                                </button></td
+                            >
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
+        </div>
         <p
             style="margin-top: 1rem; margin-bottom: 0.5rem; color: #555; font-size: 0.875rem; padding: 0 1rem;"
         >

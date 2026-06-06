@@ -57,8 +57,8 @@
 </script>
 
 <h2>Team Lines Generator</h2>
-<div style="display: flex; gap: 2rem;">
-    <div>
+<div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+    <div class="rounded_block" style="flex: 1;">
         <h3>Inputs:</h3>
         <form>
             <div
@@ -117,7 +117,7 @@
         >
     </div>
 
-    <div>
+    <div class="rounded_block">
         <h3>Output:</h3>
         {#if loading}
             <p>Loading...</p>
@@ -129,7 +129,7 @@
             />
         {:else}
             <div
-                style="border: 1px solid #000; width: fit-content; height: fit-content;"
+                style="border: 1px solid #ccc; width: fit-content; height: fit-content; background: white;"
             >
                 {@html output}
             </div>
@@ -149,5 +149,9 @@
         to {
             transform: rotate(360deg);
         }
+    }
+
+    h3 {
+        margin-bottom: 0.5rem;
     }
 </style>
