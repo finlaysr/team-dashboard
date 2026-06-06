@@ -47,7 +47,7 @@
     <form
         onsubmit={(e) => {
             e.preventDefault();
-            showWarning = !teams.currentTeam?.addMatch(
+            showWarning = !teams.currentTeam?.getMatches.addMatch(
                 date,
                 getSubTeamsInvolved(),
             );

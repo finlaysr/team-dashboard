@@ -1,12 +1,12 @@
 import { browser } from "$app/environment";
-import { Team } from "$lib/scripts/team.svelte"
+import { Team, type TeamID } from "$lib/scripts/team.svelte"
 
 const STORAGE_KEY = "teamsData";
 
 class Teams {
   teams: Team[] = $state([]);
   currentTeam: Team | null = $state(null);
-  private teamIndex: number = $state(0);
+  private teamIndex: TeamID = $state(0);
 
   loadFromStorage() {
     if (browser) {
@@ -41,7 +41,7 @@ class Teams {
     return true;
   }
 
-  deleteTeam(teamID: number): boolean {
+  deleteTeam(teamID: TeamID): boolean {
     const team = this.teams.find(t => t.teamID === teamID);
     if (team) {
       this.teams.splice(this.teams.indexOf(team), 1);

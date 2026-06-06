@@ -1,10 +1,13 @@
 <script lang="ts">
     import { teams } from "$lib/scripts/teams.svelte";
     import NewMatchModal from "$lib/components/NewMatchModal.svelte";
+    import { Availability } from "$lib/scripts/match.svelte";
 
     let showNewMatchModal: boolean = $state(false);
-    let currentMatch = $derived.by(
-        () => teams.currentTeam?.getMatches.currentMatch,
+    let currentMatch = $derived.by(() =>
+        teams.currentTeam?.getMatches.getMatchByID(
+            teams.currentTeam?.getMatches.currentMatch!,
+        ),
     );
 </script>
 
@@ -57,6 +60,14 @@
                 </h4>
             {/each}
 
+            {#each Object.keys(currentMatch?.getmatchSubTeams || {}).map(Number) as player (player)}
+                <p>
+                    {teams.currentTeam?.getPlayerByID(player)?.name} - {currentMatch
+                        ?.getmatchSubTeams[player]}
+                    - {currentMatch?.getAvailability[player]}
+                </p>
+            {/each}
+
             <div class="scroll">
                 <table>
                     <thead>
@@ -70,7 +81,7 @@
                     </thead>
 
                     <tbody>
-                        {#each currentMatch?.getmatchSubTeams.keys() as playerID (playerID)}
+                        {#each Object.keys(currentMatch?.getmatchSubTeams || {}).map(Number) as playerID (playerID)}
                             <tr>
                                 <td
                                     >{teams.currentTeam?.getPlayerByID(playerID)
@@ -78,21 +89,34 @@
                                 >
                                 <td
                                     >{teams.currentTeam?.getSubteamByID(
-                                        currentMatch?.getmatchSubTeams.get(
-                                            playerID,
-                                        )!,
+                                        currentMatch?.getmatchSubTeams[
+                                            playerID
+                                        ]!,
                                     )?.name}</td
                                 >
                                 <td
-                                    >{currentMatch?.getMatchPositions.get(
-                                        playerID,
-                                    )}</td
+                                    >{currentMatch?.getMatchPositions[
+                                        playerID
+                                    ]}</td
                                 >
-                                <td
-                                    >{currentMatch?.getAvailability.get(
-                                        playerID,
-                                    )}</td
-                                >
+                                <td>
+                                    <select
+                                        onchange={(e) => {
+                                            const target =
+                                                e.target as HTMLSelectElement;
+                                            currentMatch?.setAvailability(
+                                                playerID,
+                                                target.value as Availability,
+                                            );
+                                            teams.saveToStorage();
+                                        }}
+                                    >
+                                        {#each Object.values(Availability) as av}
+                                            <option value={av}>{av}</option>
+                                        {/each}
+                                    </select>
+                                </td>
+                                <td> </td>
                             </tr>
                         {/each}
                     </tbody>

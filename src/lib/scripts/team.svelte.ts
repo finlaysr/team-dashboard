@@ -1,20 +1,19 @@
 import { teams } from "$lib/scripts/teams.svelte";
 import { Matches } from "$lib/scripts/matches.svelte";
-import type { SubTeamsInvloved } from "$lib/scripts/match.svelte";
 
-
+export type TeamID = number;
 export class Team {
-  teamID: number = $state(-1);
+  teamID: TeamID = $state(-1);
   name: string = $state("");
   readonly subteams: SubTeam[] = $state([]);
   readonly players: Player[] = $state([]);
   youthTeam: boolean = $state(false);
-  private playerIndex: number = $state(0);
-  private subteamIndex: number = $state(0);
+  private playerIndex: PlayerID = $state(0);
+  private subteamIndex: SubTeamID = $state(0);
 
   private matches: Matches = $state(new Matches());
 
-  constructor(teamID: number, name: string, youthTeam: boolean, playerIndex: number = 0, subteamIndex: number = 0, players?: Player[], matches?: Matches, subTeamNames?: string[], subteams?: SubTeam[]) {
+  constructor(teamID: TeamID, name: string, youthTeam: boolean, playerIndex: PlayerID = 0, subteamIndex: SubTeamID = 0, players?: Player[], matches?: Matches, subTeamNames?: string[], subteams?: SubTeam[]) {
     this.teamID = teamID;
     this.name = name.trim();
     this.playerIndex = playerIndex;
@@ -64,13 +63,13 @@ export class Team {
     );
   }
 
-  addPlayer(name: string, membershipNum: string, position: Position, subTeamID: number, named: boolean, youthOptions: string): boolean {
+  addPlayer(name: string, membershipNum: string, position: Position, subTeamID: SubTeamID, named: boolean, youthOptions: string): boolean {
     if (this.players.find(p => p.name === name)) { return false };
     this.players.push(new Player(this.playerIndex++, name, membershipNum, position, subTeamID, named, youthOptions));
     return true;
   }
 
-  deletePlayer(playerID: number): boolean {
+  deletePlayer(playerID: PlayerID): boolean {
     const player = this.players.find(p => p.playerID === playerID);
     if (player) {
       this.players.splice(this.players.indexOf(player), 1);
@@ -79,7 +78,7 @@ export class Team {
     return false;
   }
 
-  updatePlayer(playerID: number, newName?: string, newMembership?: string, newPosition?: Position, newSubTeamID?: number, newNamed?: boolean, newYouthOptions?: string): boolean {
+  updatePlayer(playerID: PlayerID, newName?: string, newMembership?: string, newPosition?: Position, newSubTeamID?: SubTeamID, newNamed?: boolean, newYouthOptions?: string): boolean {
     const player = this.players.find(p => p.playerID === playerID);
     if (!player) { return false };
 
@@ -95,7 +94,7 @@ export class Team {
     return true;
   }
 
-  getPlayerByID(playerID: number): Player | undefined {
+  getPlayerByID(playerID: PlayerID): Player | undefined {
     return this.players.find(p => p.playerID === playerID);
   }
 
@@ -106,7 +105,7 @@ export class Team {
     return true;
   }
 
-  editSubteam(subTeamID: number, newName: string): boolean {
+  editSubteam(subTeamID: SubTeamID, newName: string): boolean {
     newName = newName.trim();
     if (newName.length === 0) { return false };
 
@@ -118,7 +117,7 @@ export class Team {
     return true;
   }
 
-  deleteSubteam(subTeamID: number): boolean {
+  deleteSubteam(subTeamID: SubTeamID): boolean {
     const index = this.subteams.findIndex(s => s.subTeamID === subTeamID);
     if (index !== -1) {
       this.subteams.splice(index, 1);
@@ -127,11 +126,11 @@ export class Team {
     return false;
   }
 
-  getSubteamByID(subTeamID: number): SubTeam | undefined {
+  getSubteamByID(subTeamID: SubTeamID): SubTeam | undefined {
     return this.subteams.find(s => s.subTeamID === subTeamID);
   }
 
-  getSubteamPlayers(subTeamID: number, position: Position = Position.ANY): Player[] {
+  getSubteamPlayers(subTeamID: SubTeamID, position: Position = Position.ANY): Player[] {
     const subteam = this.subteams.find(s => s.subTeamID === subTeamID);
     if (!subteam) { return []; }
     return this.players.filter(player => player.subTeamID === subteam.subTeamID && (player.position === position || position === Position.ANY));
@@ -150,10 +149,6 @@ export class Team {
   get getMatches(): Matches {
     return this.matches;
   }
-
-  addMatch(newDate: string, subTeamsInvolved: SubTeamsInvloved[]): boolean {
-    return this.matches.addMatch(newDate, subTeamsInvolved);
-  }
 }
 
 export interface SubTeam {
@@ -161,16 +156,19 @@ export interface SubTeam {
   name: string;
 }
 
+export type PlayerID = number;
+export type SubTeamID = number;
+
 export class Player {
-  playerID: number = $state(-1);
+  playerID: PlayerID = $state(-1);
   name: string = $state("");
   membershipNum: string = $state("");
   position: Position = $state(Position.ANY);
-  subTeamID: number = $state(-1);
+  subTeamID: SubTeamID = $state(-1);
   named: boolean = $state(false);
   youthOptions: string = $state("");
 
-  constructor(playerID: number, name: string, membershipNum: string, position: Position, subTeamID: number, named: boolean, youthOptions: string = "") {
+  constructor(playerID: PlayerID, name: string, membershipNum: string, position: Position, subTeamID: SubTeamID, named: boolean, youthOptions: string = "") {
     this.playerID = playerID;
     this.name = name.trim();
     this.membershipNum = membershipNum.trim();
