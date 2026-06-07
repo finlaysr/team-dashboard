@@ -1,10 +1,13 @@
 <script lang="ts">
     import { teams } from "$lib/scripts/teams.svelte";
     import { Availability } from "$lib/scripts/match.svelte";
-    import { Position } from "$lib/scripts/team.svelte";
+    import { Position, type SubTeamID } from "$lib/scripts/team.svelte";
     import type { MatchID } from "$lib/scripts/match.svelte";
 
-    let { currentMatchID }: { currentMatchID: MatchID } = $props();
+    let {
+        currentMatchID,
+        subTeamID,
+    }: { currentMatchID: MatchID; subTeamID: SubTeamID } = $props();
 
     let currentMatch = $derived(
         teams.currentTeam?.getMatches.getMatchByID(currentMatchID!),

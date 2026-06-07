@@ -34,17 +34,6 @@ export class Match {
         }
     }
 
-    getMatchPlayerByID(playerID: PlayerID): MatchPlayer | undefined {
-        return this.matchPlayers.find(mp => mp.playerID === playerID);
-    }
-
-    setAvailability(playerID: PlayerID, availability: Availability) {
-        const matchPlayer = this.getMatchPlayerByID(playerID);
-        if (matchPlayer) {
-            matchPlayer.availability = availability;
-        }
-    }
-
     addPlayer(playerID: PlayerID) {
         const player = teams.currentTeam?.getPlayerByID(playerID);
         if (player) {
@@ -73,19 +62,15 @@ export class Match {
         return this.matchPlayers;
     }
 
-    getAvailability(playerID: PlayerID): Availability {
-        const matchPlayer = this.getMatchPlayerByID(playerID);
-        return matchPlayer ? matchPlayer.availability : Availability.NO_REPLY;
+    getMatchPlayerByID(playerID: PlayerID): MatchPlayer | undefined {
+        return this.matchPlayers.find(mp => mp.playerID === playerID);
     }
 
-    getmatchSubTeams(playerID: PlayerID): SubTeamID {
+    setAvailability(playerID: PlayerID, availability: Availability) {
         const matchPlayer = this.getMatchPlayerByID(playerID);
-        return matchPlayer ? matchPlayer.matchSubTeam : -1;
-    }
-
-    getMatchPositions(playerID: PlayerID): Position {
-        const matchPlayer = this.getMatchPlayerByID(playerID);
-        return matchPlayer ? matchPlayer.matchPosition : Position.ANY;
+        if (matchPlayer) {
+            matchPlayer.availability = availability;
+        }
     }
 
     toJSON() {

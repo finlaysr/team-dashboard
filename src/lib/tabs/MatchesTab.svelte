@@ -1,21 +1,41 @@
 <script lang="ts">
     import { teams } from "$lib/scripts/teams.svelte";
     import type { MatchID } from "$lib/scripts/match.svelte";
-    import NewMatchModal from "$lib/components/NewMatchModal.svelte";
+    import type { SubTeamID } from "$lib/scripts/team.svelte";
 
+    import NewMatchModal from "$lib/components/NewMatchModal.svelte";
     import AvailabilityTab from "$lib/tabs/matchesSubTabs/Availability.svelte";
+    import SubTeamTab from "$lib/tabs/matchesSubTabs/SubTeam.svelte";
 
     let showNewMatchModal: boolean = $state(false);
     let currentMatchID: MatchID | null = $derived(
         teams.currentTeam?.getMatches.currentMatch || null,
     );
 
-    let currentMatch = $derived.by(() =>
+    let currentMatch = $derived(
         teams.currentTeam?.getMatches.getMatchByID(currentMatchID!),
     );
 
-    let tabs = $state([{ name: "Availability", comp: AvailabilityTab }]);
-    let currTab = $state(tabs[0]);
+    let tabs: {
+        name: string;
+        comp: typeof SubTeamTab | typeof AvailabilityTab;
+        subTeamID: SubTeamID;
+    }[] = $derived(
+        [{ name: "Availability", comp: AvailabilityTab, subTeamID: -1 }].concat(
+            currentMatch?.getSubTeamsInvolved.map((subteam) => {
+                return {
+                    name:
+                        teams.currentTeam?.getSubteamByID(subteam.subTeamID)
+                            ?.name || "Sub Team",
+                    comp: SubTeamTab,
+                    subTeamID: subteam.subTeamID,
+                };
+            }) || [],
+        ),
+    );
+    let currTab = $derived(tabs[0]);
+
+    let currSubTeamTab: SubTeamID = $state(-1);
 </script>
 
 <h2>Match Days</h2>
@@ -82,7 +102,10 @@
                     {#each tabs as tab}
                         <button
                             class:selected={currTab === tab}
-                            onclick={() => (currTab = tab)}
+                            onclick={() => {
+                                currTab = tab;
+                                currSubTeamTab = tab.subTeamID;
+                            }}
                         >
                             {tab.name}
                         </button>
@@ -91,7 +114,10 @@
 
                 <div class="tabs_content">
                     {#if currentMatchID}
-                        <currTab.comp {currentMatchID} />
+                        <currTab.comp
+                            {currentMatchID}
+                            subTeamID={currSubTeamTab}
+                        />
                     {/if}
                 </div>
             </div>
@@ -129,6 +155,7 @@
 
     .tabs {
         display: flex;
+        flex-wrap: wrap;
     }
 
     .tabs button {
