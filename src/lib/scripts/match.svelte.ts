@@ -12,14 +12,16 @@ export class Match {
 
     constructor(matchID: MatchID, date: string, subTeamsInvolved: SubTeamsInvloved[], matchPlayers?: MatchPlayer[]) {
         const setDefaultPlayers = () => {
-            teams.currentTeam?.players.forEach((p) => {
-                this.matchPlayers.push({
-                    playerID: p.playerID,
-                    availability: Availability.NO_REPLY,
-                    matchSubTeam: p.subTeamID,
-                    matchPosition: p.position
+            teams.currentTeam?.players
+                .filter(p => subTeamsInvolved.some(st => st.subTeamID === p.subTeamID))
+                .forEach((p) => {
+                    this.matchPlayers.push({
+                        playerID: p.playerID,
+                        availability: Availability.NO_REPLY,
+                        matchSubTeam: p.subTeamID,
+                        matchPosition: p.position
+                    });
                 });
-            });
         }
 
         this.matchID = matchID;
@@ -40,6 +42,18 @@ export class Match {
         const matchPlayer = this.getMatchPlayerByID(playerID);
         if (matchPlayer) {
             matchPlayer.availability = availability;
+        }
+    }
+
+    addPlayer(playerID: PlayerID) {
+        const player = teams.currentTeam?.getPlayerByID(playerID);
+        if (player) {
+            this.matchPlayers.push({
+                playerID: player.playerID,
+                availability: Availability.NO_REPLY,
+                matchSubTeam: player.subTeamID,
+                matchPosition: player.position
+            });
         }
     }
 
