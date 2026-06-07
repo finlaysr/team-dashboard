@@ -2,6 +2,7 @@
     import { teams } from "$lib/scripts/teams.svelte";
     import NewMatchModal from "$lib/components/NewMatchModal.svelte";
     import { Availability } from "$lib/scripts/match.svelte";
+    import { Position } from "$lib/scripts/team.svelte";
 
     let showNewMatchModal: boolean = $state(false);
     let currentMatch = $derived.by(() =>
@@ -60,11 +61,11 @@
                 </h4>
             {/each}
 
-            {#each Object.keys(currentMatch?.getmatchSubTeams || {}).map(Number) as player (player)}
+            {#each currentMatch?.getMatchPlayers as matchPlayer (matchPlayer.playerID)}
                 <p>
-                    {teams.currentTeam?.getPlayerByID(player)?.name} - {currentMatch
-                        ?.getmatchSubTeams[player]}
-                    - {currentMatch?.getAvailability[player]}
+                    {teams.currentTeam?.getPlayerByID(matchPlayer.playerID)
+                        ?.name}
+                    : {matchPlayer.availability}, {matchPlayer.matchSubTeam}, {matchPlayer.matchPosition}
                 </p>
             {/each}
 
@@ -81,40 +82,48 @@
                     </thead>
 
                     <tbody>
-                        {#each Object.keys(currentMatch?.getmatchSubTeams || {}).map(Number) as playerID (playerID)}
+                        {#each currentMatch?.getMatchPlayers as matchPlayer (matchPlayer.playerID)}
                             <tr>
-                                <td
-                                    >{teams.currentTeam?.getPlayerByID(playerID)
-                                        ?.name}</td
-                                >
-                                <td
-                                    >{teams.currentTeam?.getSubteamByID(
-                                        currentMatch?.getmatchSubTeams[
-                                            playerID
-                                        ]!,
-                                    )?.name}</td
-                                >
-                                <td
-                                    >{currentMatch?.getMatchPositions[
-                                        playerID
-                                    ]}</td
-                                >
+                                <td>
+                                    {teams.currentTeam?.getPlayerByID(
+                                        matchPlayer.playerID,
+                                    )?.name}
+                                </td>
                                 <td>
                                     <select
-                                        onchange={(e) => {
-                                            const target =
-                                                e.target as HTMLSelectElement;
-                                            currentMatch?.setAvailability(
-                                                playerID,
-                                                target.value as Availability,
-                                            );
-                                            teams.saveToStorage();
-                                        }}
+                                        bind:value={matchPlayer.matchSubTeam}
                                     >
-                                        {#each Object.values(Availability) as av}
-                                            <option value={av}>{av}</option>
+                                        {#each currentMatch?.getSubTeamsInvolved as subteam (subteam.subTeamID)}
+                                            <option value={subteam.subTeamID}>
+                                                {teams.currentTeam?.getSubteamByID(
+                                                    subteam.subTeamID,
+                                                )?.name}
+                                            </option>
                                         {/each}
                                     </select>
+                                </td>
+                                <td>
+                                    <select
+                                        bind:value={matchPlayer.matchPosition}
+                                    >
+                                        {#each Object.values(Position) as pos}
+                                            <option value={pos}>{pos}</option>
+                                        {/each}
+                                    </select>
+                                </td>
+                                <td>
+                                    {#each Object.values(Availability) as av}
+                                        <label>
+                                            <input
+                                                type="radio"
+                                                bind:group={
+                                                    matchPlayer.availability
+                                                }
+                                                value={av}
+                                            />
+                                            {av}
+                                        </label>
+                                    {/each}
                                 </td>
                                 <td> </td>
                             </tr>

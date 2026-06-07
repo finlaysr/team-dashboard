@@ -1,4 +1,5 @@
-import type { Player, Position, PlayerID, SubTeamID } from "$lib/scripts/team.svelte";
+import type { Player, PlayerID, SubTeamID } from "$lib/scripts/team.svelte";
+import { Position } from "$lib/scripts/team.svelte";
 import { teams } from "$lib/scripts/teams.svelte";
 
 export type MatchID = number;
@@ -7,52 +8,39 @@ export class Match {
     private date: string = $state("");
     private subTeamsInvolved: SubTeamsInvloved[] = $state([]);
 
-    private availability: Record<PlayerID, Availability> = $state({});
-    private matchSubTeams: Record<PlayerID, SubTeamID> = $state({});
-    private matchPositions: Record<PlayerID, Position> = $state({});
+    private matchPlayers: MatchPlayer[] = $state([]);
 
-    constructor(matchID: MatchID, date: string, subTeamsInvolved: SubTeamsInvloved[], availability?: Record<PlayerID, Availability>, matchSubTeams?: Record<PlayerID, SubTeamID>, matchPositions?: Record<PlayerID, Position>) {
-        function setDefaultSubteams(record: Record<PlayerID, SubTeamID>) {
+    constructor(matchID: MatchID, date: string, subTeamsInvolved: SubTeamsInvloved[], matchPlayers?: MatchPlayer[]) {
+        const setDefaultPlayers = () => {
             teams.currentTeam?.players.forEach((p) => {
-                record[p.playerID] = p.subTeamID;
-            });
-        }
-
-        function setDefaultAvailability(record: Record<PlayerID, Availability>) {
-            teams.currentTeam?.players.forEach((p) => {
-                record[p.playerID] = Availability.NO_REPLY;
-            });
-        }
-
-        function setDefaultPositions(record: Record<PlayerID, Position>) {
-            teams.currentTeam?.players.forEach((p) => {
-                record[p.playerID] = p.position;
+                this.matchPlayers.push({
+                    playerID: p.playerID,
+                    availability: Availability.NO_REPLY,
+                    matchSubTeam: p.subTeamID,
+                    matchPosition: p.position
+                });
             });
         }
 
         this.matchID = matchID;
         this.date = date.trim();
         this.subTeamsInvolved = subTeamsInvolved;
-        if (matchSubTeams) {
-            this.matchSubTeams = matchSubTeams;
+        if (matchPlayers) {
+            this.matchPlayers = matchPlayers;
         } else {
-            setDefaultSubteams(this.matchSubTeams);
-        }
-        if (availability) {
-            this.availability = availability;
-        } else {
-            setDefaultAvailability(this.availability);
-        }
-        if (matchPositions) {
-            this.matchPositions = matchPositions;
-        } else {
-            setDefaultPositions(this.matchPositions);
+            setDefaultPlayers();
         }
     }
 
+    getMatchPlayerByID(playerID: PlayerID): MatchPlayer | undefined {
+        return this.matchPlayers.find(mp => mp.playerID === playerID);
+    }
+
     setAvailability(playerID: PlayerID, availability: Availability) {
-        this.availability[playerID] = availability;
-        console.log("availability: ", $state.snapshot(this.availability));
+        const matchPlayer = this.getMatchPlayerByID(playerID);
+        if (matchPlayer) {
+            matchPlayer.availability = availability;
+        }
     }
 
     get getID(): MatchID {
@@ -63,46 +51,54 @@ export class Match {
         return this.date;
     }
 
-    get getAvailability(): Record<PlayerID, Availability> {
-        return this.availability;
-    }
-
     get getSubTeamsInvolved(): SubTeamsInvloved[] {
         return this.subTeamsInvolved;
     }
 
-    get getmatchSubTeams(): Record<PlayerID, SubTeamID> {
-        return this.matchSubTeams;
+    get getMatchPlayers(): MatchPlayer[] {
+        return this.matchPlayers;
     }
 
-    get getMatchPositions(): Record<PlayerID, Position> {
-        return this.matchPositions;
+    getAvailability(playerID: PlayerID): Availability {
+        const matchPlayer = this.getMatchPlayerByID(playerID);
+        return matchPlayer ? matchPlayer.availability : Availability.NO_REPLY;
+    }
+
+    getmatchSubTeams(playerID: PlayerID): SubTeamID {
+        const matchPlayer = this.getMatchPlayerByID(playerID);
+        return matchPlayer ? matchPlayer.matchSubTeam : -1;
+    }
+
+    getMatchPositions(playerID: PlayerID): Position {
+        const matchPlayer = this.getMatchPlayerByID(playerID);
+        return matchPlayer ? matchPlayer.matchPosition : Position.ANY;
     }
 
     toJSON() {
-        console.log("availability saved: ", $state.snapshot(this.availability));
         return {
             matchID: $state.snapshot(this.matchID),
             date: $state.snapshot(this.date),
             subTeamsInvolved: $state.snapshot(this.subTeamsInvolved),
-            availability: $state.snapshot(this.availability),
-            matchSubTeams: $state.snapshot(this.matchSubTeams),
-            matchPositions: $state.snapshot(this.matchPositions),
+            matchPlayers: $state.snapshot(this.matchPlayers)
         }
     }
 
     static fromJSON(data: string): Match {
         let json = JSON.parse(data);
-        console.log("availability loaded: ", json.availability);
         return new Match(
             json.matchID,
             json.date,
             json.subTeamsInvolved,
-            json.availability,
-            json.matchSubTeams,
-            json.matchPositions
+            json.matchPlayers
         );
     }
+}
+
+export interface MatchPlayer {
+    "playerID": PlayerID;
+    "availability": Availability;
+    "matchSubTeam": SubTeamID;
+    "matchPosition": Position;
 }
 
 export enum Availability {
