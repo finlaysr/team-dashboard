@@ -25,7 +25,7 @@
 <div
     style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;"
 >
-    <p>Show:</p>
+    <p>Include:</p>
     {#each Object.values(Availability) as av}
         <label class={av.replace(" ", "-") + " player"} for={av}>
             <input
@@ -38,7 +38,7 @@
     {/each}
 </div>
 
-<h3>Availabile</h3>
+<h3>Lineup</h3>
 {#each Object.values(Position) as pos}
     {let players = $derived(currentMatch?.getMatchPlayers.filter(mp => mp.matchSubTeam === subTeamID && mp.matchPosition === pos && showAvailability[mp.availability]))}
     <div class="rounded_block" style="padding: 0.5rem; ">
@@ -53,6 +53,19 @@
         </div>
     </div>
 {/each}
+
+<h3>Player List</h3>
+{let allPlayers = $derived(currentMatch?.getMatchPlayers.filter(mp => mp.matchSubTeam === subTeamID && showAvailability[mp.availability]).map(mp => teams.currentTeam?.getPlayerByID(mp.playerID)?.name))}
+
+<div class="rounded_block">
+    <pre>{allPlayers?.join("\n")}</pre>
+</div>
+
+<button onclick={() => {
+        navigator.clipboard.writeText(allPlayers?.join("\n") || "");
+    }} >
+    Copy Player List
+</button>
 
 <style>
     .player {
@@ -85,5 +98,14 @@
     .No-Reply {
         background-color: var(--av-no-reply-bg);
         color: var(--av-no-reply-fg);
+    }
+
+    pre {
+        margin: 0;
+        background-color: #f9f9f9;
+        font-size: 0.875rem;
+    }
+    h3 {
+        margin-bottom: 0.5rem;
     }
 </style>

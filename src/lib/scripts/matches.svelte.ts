@@ -27,8 +27,8 @@ export class Matches {
     return match ? match : null;
   }
 
-  addMatch(newDate: string, subTeamsInvolved: SubTeamsInvloved[]): boolean {
-    this.matches.push(new Match(this.matchIndex++, newDate.trim(), subTeamsInvolved));
+  addMatch(newDate: string, subTeamsInvolved: SubTeamsInvloved[], onlySubTeamPlayers: boolean): boolean {
+    this.matches.push(new Match(this.matchIndex++, newDate.trim(), subTeamsInvolved, onlySubTeamPlayers));
     this.currentMatch = this.matches[this.matches.length - 1].getID;
     return true;
   }

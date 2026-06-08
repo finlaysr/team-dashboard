@@ -8,6 +8,7 @@
     let showWarning: boolean = $state(false);
     let subTeamsCheckboxes: boolean[] = $state([]);
     let subTeamsDesc: string[] = $state([]);
+    let onlySubTeamPlayers: boolean = $state(false);
 
     $effect(() => {
         if (showModal) {
@@ -29,7 +30,7 @@
             .map(([i, _]) => {
                 return {
                     subTeamID: teams.currentTeam!.subteams[i].subTeamID,
-                    description: subTeamsDesc[i].trim(),
+                    description: subTeamsDesc[i]?.trim() || "",
                 };
             })
             .toArray();
@@ -47,9 +48,17 @@
     <form
         onsubmit={(e) => {
             e.preventDefault();
+            if (
+                getSubTeamsInvolved().length === 0 ||
+                getSubTeamsInvolved().some((st) => st.description === "")
+            ) {
+                showWarning = true;
+                return;
+            }
             showWarning = !teams.currentTeam?.getMatches.addMatch(
                 date,
                 getSubTeamsInvolved(),
+                onlySubTeamPlayers,
             );
             if (!showWarning) {
                 dialog?.close();
@@ -58,14 +67,25 @@
     >
         <p>Match Date:</p>
         <input type="date" required bind:value={date} />
+        <br />
+        <label
+            ><input
+                type="checkbox"
+                bind:checked={onlySubTeamPlayers}
+                style="margin: 0.5rem 0;"
+            />
+            Include only players from the specified subteams</label
+        >
+
         <p>Subteams Involved:</p>
-        {#each teams.currentTeam?.subteams as { name, subTeamID }, i}
+        {#each teams.currentTeam?.subteams as { subTeamID, name }, i}
             <div>
                 <label
                     ><input
                         type="checkbox"
                         bind:checked={subTeamsCheckboxes[i]}
-                    />{name}</label
+                    />
+                    {name}</label
                 >
                 <input
                     type="text"
@@ -74,6 +94,7 @@
                 />
             </div>
         {/each}
+
         <div style="margin-top: 1rem;">
             <button type="button" onclick={() => dialog?.close()}>Cancel</button
             >
@@ -81,9 +102,11 @@
         </div>
         {#if showWarning}
             <p
-                style="color: red; margin-top: 1rem; width: 100%; text-align: center;"
+                style="color: red; margin-top: 1rem; width: 100%; text-align: center; white-space: normal; overflow-wrap: anywhere;"
             >
-                Could not create match.<br />
+                Could not create match. <br />
+                Check that you have selected some subteams <br />
+                and provided descriptions for the selected subteams.<br />
             </p>
         {/if}
     </form>

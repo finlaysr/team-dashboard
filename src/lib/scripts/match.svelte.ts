@@ -10,10 +10,10 @@ export class Match {
 
     private matchPlayers: MatchPlayer[] = $state([]);
 
-    constructor(matchID: MatchID, date: string, subTeamsInvolved: SubTeamsInvloved[], matchPlayers?: MatchPlayer[]) {
+    constructor(matchID: MatchID, date: string, subTeamsInvolved: SubTeamsInvloved[], onlySubTeamPlayers: boolean, matchPlayers?: MatchPlayer[]) {
         const setDefaultPlayers = () => {
             teams.currentTeam?.players
-                .filter(p => subTeamsInvolved.some(st => st.subTeamID === p.subTeamID))
+                .filter(p => subTeamsInvolved.some(st => st.subTeamID === p.subTeamID || !onlySubTeamPlayers))
                 .forEach((p) => {
                     this.matchPlayers.push({
                         playerID: p.playerID,
@@ -92,6 +92,7 @@ export class Match {
             json.matchID,
             json.date,
             json.subTeamsInvolved,
+            false,
             json.matchPlayers
         );
     }
