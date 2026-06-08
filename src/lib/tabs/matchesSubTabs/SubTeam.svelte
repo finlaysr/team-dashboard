@@ -33,7 +33,7 @@
                 bind:checked={showAvailability[av]}
                 id={av}
             />
-            {av}
+            {av} ({currentMatch?.getMatchPlayers.filter(mp => mp.matchSubTeam === subTeamID && mp.availability === av).length})
         </label>
     {/each}
 </div>

@@ -106,6 +106,9 @@
         cursor: pointer;
         font-size: 1.25rem;
         border-radius: 0;
+        transition:
+            background-color 0.3s,
+            font-weight 0.3s;
     }
 
     .tabs button.selected {

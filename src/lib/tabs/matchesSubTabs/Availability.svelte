@@ -22,6 +22,17 @@
 </script>
 
 <div class="scroll">
+    <div
+        style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;"
+    >
+        {#each Object.values(Availability) as av}
+            <p class={av.replace(" ", "-") + " player"}>
+                {av}: {currentMatch?.getMatchPlayers.filter(
+                    (mp) => mp.availability === av,
+                ).length}
+            </p>
+        {/each}
+    </div>
     <table>
         <thead>
             <tr>
@@ -266,5 +277,37 @@
     input[value="No Reply"]:checked + svg {
         background-color: var(--av-no-reply-bg);
         border-radius: 50%;
+    }
+
+    .player {
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        margin: 0.25rem 0;
+        width: fit-content;
+    }
+
+    .Yes {
+        background-color: var(--av-yes-bg);
+        color: var(--av-yes-fg);
+    }
+
+    .Maybe {
+        background-color: var(--av-maybe-bg);
+        color: var(--av-maybe-fg);
+    }
+
+    .No {
+        background-color: var(--av-no-bg);
+        color: var(--av-no-fg);
+    }
+
+    .Injured {
+        background-color: var(--av-injured-bg);
+        color: var(--av-injured-fg);
+    }
+
+    .No-Reply {
+        background-color: var(--av-no-reply-bg);
+        color: var(--av-no-reply-fg);
     }
 </style>

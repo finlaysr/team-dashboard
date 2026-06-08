@@ -169,7 +169,7 @@
         padding: 0.5rem 1rem;
         cursor: pointer;
         font-size: 1rem;
-        border-radius: 0.5rem 0.5rem 0 0;
+        border-radius: 0.75rem 0.75rem 0 0;
         transition:
             background-color 0.3s,
             font-weight 0.3s;
