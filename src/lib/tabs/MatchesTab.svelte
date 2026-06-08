@@ -36,6 +36,8 @@
     let currTab = $derived(tabs[0]);
 
     let currSubTeamTab: SubTeamID = $state(-1);
+
+    // FIX: When adding first match, it doesn't appear unil second match added.
 </script>
 
 <h2>Match Days</h2>
@@ -67,8 +69,9 @@
                     <form>
                         <select bind:value={currentMatchID}>
                             {#each teams.currentTeam?.getMatches.getMatches as match (match.getID)}
+                                {let d = $derived(new Date(match.getDate))}
                                 <option value={match.getID}
-                                    >{match.getDate}</option
+                                    >{d.toLocaleDateString("en-GB",  { year: 'numeric', month: 'long', day: 'numeric' })}</option
                                 >
                             {/each}
                         </select>
@@ -90,13 +93,6 @@
                 </h4>
             {/each}
 
-            {#each currentMatch?.getMatchPlayers as matchPlayer (matchPlayer.playerID)}
-                <p>
-                    {teams.currentTeam?.getPlayerByID(matchPlayer.playerID)
-                        ?.name}
-                    : {matchPlayer.availability}, {matchPlayer.matchSubTeam}, {matchPlayer.matchPosition}
-                </p>
-            {/each}
             <div class="tabs_container">
                 <div class="tabs">
                     {#each tabs as tab}
@@ -141,6 +137,14 @@
             >
                 Delete Match Day
             </button>
+
+            <!-- {#each currentMatch?.getMatchPlayers as matchPlayer (matchPlayer.playerID)}
+                <p>
+                    {teams.currentTeam?.getPlayerByID(matchPlayer.playerID)
+                        ?.name}
+                    : {matchPlayer.availability}, {matchPlayer.matchSubTeam}, {matchPlayer.matchPosition}
+                </p>
+            {/each} -->
         </div>
     {/if}
 {/if}
@@ -166,6 +170,9 @@
         cursor: pointer;
         font-size: 1rem;
         border-radius: 0.5rem 0.5rem 0 0;
+        transition:
+            background-color 0.3s,
+            font-weight 0.3s;
     }
 
     .tabs button.selected {

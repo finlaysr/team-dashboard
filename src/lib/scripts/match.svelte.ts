@@ -36,7 +36,7 @@ export class Match {
 
     addPlayer(playerID: PlayerID) {
         const player = teams.currentTeam?.getPlayerByID(playerID);
-        if (player) {
+        if (player && this.matchPlayers.every(mp => mp.playerID !== playerID)) {
             this.matchPlayers.push({
                 playerID: player.playerID,
                 availability: Availability.NO_REPLY,
@@ -44,6 +44,10 @@ export class Match {
                 matchPosition: player.position
             });
         }
+    }
+
+    removePlayer(playerID: PlayerID) {
+        this.matchPlayers = this.matchPlayers.filter(mp => mp.playerID !== playerID);
     }
 
     get getID(): MatchID {

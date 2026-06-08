@@ -1,7 +1,11 @@
 <script lang="ts">
     import { teams } from "$lib/scripts/teams.svelte";
     import { Availability } from "$lib/scripts/match.svelte";
-    import { Position, type SubTeamID } from "$lib/scripts/team.svelte";
+    import {
+        Position,
+        type SubTeamID,
+        type PlayerID,
+    } from "$lib/scripts/team.svelte";
     import type { MatchID } from "$lib/scripts/match.svelte";
 
     let {
@@ -12,6 +16,9 @@
     let currentMatch = $derived(
         teams.currentTeam?.getMatches.getMatchByID(currentMatchID!),
     );
+
+    let addingPlayer: boolean = $state(false);
+    let playerToAdd: PlayerID | null = $state(null);
 </script>
 
 <div class="scroll">
@@ -97,11 +104,62 @@
                         </select>
                     </td>
 
-                    <td> </td>
+                    <td>
+                        <button
+                            class="danger"
+                            onclick={() =>
+                                currentMatch?.removePlayer(
+                                    matchPlayer.playerID,
+                                )}
+                        >
+                            Remove
+                        </button>
+                    </td>
                 </tr>
             {/each}
         </tbody>
     </table>
+    {#if !addingPlayer}
+        <button
+            class="primary"
+            style="margin-top: 1rem;"
+            onclick={() => (addingPlayer = true)}
+        >
+            Add Player
+        </button>
+    {:else}
+        <div
+            style="margin-top: 1rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;"
+        >
+            <p>Select player:</p>
+            <form>
+                <select bind:value={playerToAdd}>
+                    <option value={null} disabled selected>
+                        choose player
+                    </option>
+                    {#each teams.currentTeam?.players.filter((p) => !currentMatch?.getMatchPlayers.some((mp) => mp.playerID === p.playerID)) as player (player.playerID)}
+                        <option value={player.playerID}>
+                            {player.name}
+                        </option>
+                    {/each}
+                </select>
+                <button type="button" onclick={() => (addingPlayer = false)}>
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    class="primary"
+                    onclick={() => {
+                        if (playerToAdd != null) {
+                            currentMatch?.addPlayer(playerToAdd);
+                            playerToAdd = null;
+                            addingPlayer = false;
+                        }
+                    }}>Add</button
+                >
+            </form>
+        </div>
+    {/if}
 </div>
 
 <style>
@@ -156,57 +214,57 @@
     }
 
     input[value="Yes"]:hover + svg,
-    input[value="Yes"]:focus + svg {
-        fill: rgb(0, 173, 0);
+    input[value="Yes"]:focus + svg,
+    input[value="Yes"]:checked + svg {
+        fill: var(--av-yes-fg);
     }
 
     input[value="Yes"]:checked + svg {
-        fill: rgb(0, 173, 0);
-        background-color: rgb(160, 247, 176);
+        background-color: var(--av-yes-bg);
         border-radius: 50%;
     }
 
     input[value="Maybe"]:hover + svg,
-    input[value="Maybe"]:focus + svg {
-        fill: rgb(21, 101, 192);
+    input[value="Maybe"]:focus + svg,
+    input[value="Maybe"]:checked + svg {
+        fill: var(--av-maybe-fg);
     }
 
     input[value="Maybe"]:checked + svg {
-        fill: rgb(21, 101, 192);
-        background-color: rgb(207, 227, 250);
+        background-color: var(--av-maybe-bg);
         border-radius: 50%;
     }
 
     input[value="Injured"]:hover + svg,
-    input[value="Injured"]:focus + svg {
-        fill: rgb(255, 157, 0);
+    input[value="Injured"]:focus + svg,
+    input[value="Injured"]:checked + svg {
+        fill: var(--av-injured-fg);
     }
 
     input[value="Injured"]:checked + svg {
-        fill: rgb(255, 157, 0);
-        background-color: rgb(255, 220, 150);
+        background-color: var(--av-injured-bg);
         border-radius: 50%;
     }
 
     input[value="No"]:hover + svg,
-    input[value="No"]:focus + svg {
-        fill: rgb(200, 0, 0);
+    input[value="No"]:focus + svg,
+    input[value="No"]:checked + svg {
+        fill: var(--av-no-fg);
     }
 
     input[value="No"]:checked + svg {
-        fill: rgb(200, 0, 0);
-        background-color: rgb(255, 200, 200);
+        background-color: var(--av-no-bg);
         border-radius: 50%;
     }
 
     input[value="No Reply"]:hover + svg,
-    input[value="No Reply"]:focus + svg {
-        fill: rgb(0, 0, 0);
+    input[value="No Reply"]:focus + svg,
+    input[value="No Reply"]:checked + svg {
+        fill: var(--av-no-reply-fg);
     }
 
     input[value="No Reply"]:checked + svg {
-        fill: rgb(0, 0, 0);
-        background-color: rgb(200, 200, 200);
+        background-color: var(--av-no-reply-bg);
         border-radius: 50%;
     }
 </style>
