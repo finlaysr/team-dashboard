@@ -108,4 +108,8 @@
     h3 {
         margin-bottom: 0.5rem;
     }
+
+    :global(body.dark-mode) pre {
+        background-color: #1b1e1f;
+    }
 </style>

@@ -157,6 +157,11 @@
         background-color: #fff;
     }
 
+    :global(body.dark-mode) .tabs_content {
+        background-color: #25292b;
+        border-color: #444;
+    }
+
     .tabs {
         display: flex;
         flex-wrap: wrap;
@@ -175,8 +180,16 @@
             font-weight 0.3s;
     }
 
+    :global(body.dark-mode) .tabs button {
+        border-color: #444;
+    }
+
     .tabs button.selected {
         background-color: #ddd;
         font-weight: bold;
+    }
+
+    :global(body.dark-mode) .tabs button.selected {
+        background-color: #555;
     }
 </style>

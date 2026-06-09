@@ -5,6 +5,10 @@
     import NewTeamModal from "$lib/components/NewTeamModal.svelte";
     import MatchesTab from "$lib/tabs/MatchesTab.svelte";
     import { onMount } from "svelte";
+
+    import darkModeIcon from "$lib/assets/dark_mode.svg";
+    import lightModeIcon from "$lib/assets/light_mode.svg";
+
     let loaded = $state(false);
     onMount(() => {
         if (!loaded) {
@@ -25,6 +29,8 @@
     $effect(() => {
         teams.saveToStorage();
     });
+
+    let darkMode: boolean = $state(false);
 </script>
 
 <main>
@@ -52,6 +58,20 @@
                 </button>
             {/if}
         </div>
+        <button
+            onclick={() => {
+                window.document.body.classList.toggle("dark-mode");
+                darkMode = window.document.body.classList.contains("dark-mode");
+            }}
+            style="margin-left: auto; background: none; border: none; padding: 0;"
+        >
+            <img
+                src={darkMode ? lightModeIcon : darkModeIcon}
+                alt="Light Mode"
+                title="Light Mode"
+                style="width: 24px; height: 24px; cursor: pointer;"
+            />
+        </button>
     </div>
 
     {#if loaded}
@@ -99,6 +119,10 @@
         flex-wrap: wrap;
     }
 
+    :global(body.dark-mode) .tabs {
+        background-color: #333;
+    }
+
     .tabs button {
         padding: 0.5rem 1rem;
         border: none;
@@ -114,6 +138,10 @@
     .tabs button.selected {
         background-color: #ddd;
         font-weight: bold;
+    }
+
+    :global(body.dark-mode) .tabs button.selected {
+        background-color: #555;
     }
 
     form {
