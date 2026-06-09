@@ -3,6 +3,7 @@
     import { Position, type SubTeamID } from "$lib/scripts/team.svelte";
     import type { MatchID } from "$lib/scripts/match.svelte";
     import { Availability } from "$lib/scripts/match.svelte";
+    import { onMount } from "svelte";
 
     let {
         currentMatchID,
@@ -20,10 +21,30 @@
         [Availability.NO]: false,
         [Availability.NO_REPLY]: false,
     });
+
+    // load cookies when loaded to get which availabilities to show
+    onMount(() => {
+        const cookieValue = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("showAvailability="))
+            ?.split("=")[1];
+        if (cookieValue) {
+            try {
+                showAvailability = JSON.parse(cookieValue);
+            } catch (e) {
+                console.error("Failed to parse showAvailability cookie:", e);
+            }
+        }
+    });
+
+    // Update cookies when changed
+    $effect(() => {
+        document.cookie = `showAvailability=${JSON.stringify(showAvailability)}; path=/; max-age=31536000`; // 1 year
+    });
 </script>
 
 <div
-    style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;"
+    style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;"
 >
     <p>Include:</p>
     {#each Object.values(Availability) as av}
@@ -46,7 +67,7 @@
         <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                 
             {#each players as player (player.playerID)}
-                <p class={player.availability.replace(" ", "-") + " player"}>
+                <p class={player.availability.replace(" ", "-") + (player.substitute ? " substitute" : "") + " player"}>
                     {teams.currentTeam?.getPlayerByID(player.playerID)?.name}
                 </p>
             {/each}
@@ -98,6 +119,31 @@
     .No-Reply {
         background-color: var(--av-no-reply-bg);
         color: var(--av-no-reply-fg);
+    }
+
+    .substitute {
+        font-style: italic;
+        background-color: transparent;
+    }
+
+    .substitute.Yes {
+        border: 2px solid var(--av-yes-fg);
+    }
+
+    .substitute.Maybe {
+        border: 2px solid var(--av-maybe-fg);
+    }
+
+    .substitute.No {
+        border: 2px solid var(--av-no-fg);
+    }
+
+    .substitute.Injured {
+        border: 2px solid var(--av-injured-fg);
+    }
+
+    .substitute.No-Reply {
+        border: 2px solid var(--av-no-reply-fg);
     }
 
     pre {

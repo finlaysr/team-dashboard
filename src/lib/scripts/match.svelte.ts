@@ -19,7 +19,8 @@ export class Match {
                         playerID: p.playerID,
                         availability: Availability.NO_REPLY,
                         matchSubTeam: p.subTeamID,
-                        matchPosition: p.position
+                        matchPosition: p.position,
+                        substitute: false
                     });
                 });
         }
@@ -41,7 +42,8 @@ export class Match {
                 playerID: player.playerID,
                 availability: Availability.NO_REPLY,
                 matchSubTeam: player.subTeamID,
-                matchPosition: player.position
+                matchPosition: player.position,
+                substitute: false
             });
         }
     }
@@ -103,6 +105,7 @@ export interface MatchPlayer {
     "availability": Availability;
     "matchSubTeam": SubTeamID;
     "matchPosition": Position;
+    "substitute": boolean;
 }
 
 export enum Availability {

@@ -31,6 +31,17 @@
     });
 
     let darkMode: boolean = $state(false);
+
+    onMount(() => {
+        if (document.cookie.includes("darkMode=true")) {
+            window.document.body.classList.add("dark-mode");
+            darkMode = true;
+        }
+
+        $effect(() => {
+            document.cookie = `darkMode=${darkMode}; path=/; max-age=31536000`; // 1 year
+        });
+    });
 </script>
 
 <main>

@@ -40,6 +40,7 @@
                 <th>Availability</th>
                 <th>Sub Team</th>
                 <th>Position</th>
+                <th>Substitute</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -115,6 +116,17 @@
                         </select>
                     </td>
 
+                    <td>
+                        <label
+                            style="display: inline-flex; align-items: center; gap: 0.5rem;"
+                        >
+                            <input
+                                type="checkbox"
+                                bind:checked={matchPlayer.substitute}
+                            />
+                            Sub
+                        </label>
+                    </td>
                     <td>
                         <button
                             class="danger"
