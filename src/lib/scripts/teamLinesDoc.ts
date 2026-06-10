@@ -113,7 +113,7 @@ export interface teamLinesDocInputs {
   }
 }
 
-interface TeamLinePlayer {
+export interface TeamLinePlayer {
   num: string;
   name: string;
   membNum: string;
