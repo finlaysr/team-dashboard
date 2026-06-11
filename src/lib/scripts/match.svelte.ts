@@ -65,7 +65,22 @@ export class Match {
     }
 
     get getMatchPlayers(): MatchPlayer[] {
-        return this.matchPlayers;
+        let sorted = [...this.matchPlayers];
+
+        // make subs appear after non-subs
+        sorted.sort((a, b) => {
+            return (a == b) ? 0 : a.substitute ? 1 : -1;
+        });
+        // make players appear in order of position
+        sorted.sort((a, b) => {
+            const positionOrder = [Position.GK, Position.DEF, Position.CEN, Position.FWD, Position.ANY];
+            return positionOrder.indexOf(a.matchPosition) - positionOrder.indexOf(b.matchPosition);
+        });
+        // sort by sub team
+        sorted.sort((a, b) => {
+            return a.matchSubTeam - b.matchSubTeam;
+        });
+        return sorted;
     }
 
     getMatchPlayerByID(playerID: PlayerID): MatchPlayer | undefined {

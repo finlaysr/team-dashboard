@@ -142,6 +142,7 @@
             {/each}
         </tbody>
     </table>
+    <p>Table sorted by sub team, then position, then substitute status</p>
     {#if !addingPlayer}
         <button
             class="primary"

@@ -22,6 +22,9 @@
         [Availability.NO_REPLY]: false,
     });
 
+    let showSubMarker: boolean = $state(false);
+    let allPlayers = $derived(currentMatch?.getMatchPlayers.filter(mp => mp.matchSubTeam === subTeamID && showAvailability[mp.availability]).map(mp => teams.currentTeam?.getPlayerByID(mp.playerID)?.name + (mp.substitute && showSubMarker ? " (Sub)" : "")));
+
     // load cookies when loaded to get which availabilities to show
     onMount(() => {
         const cookieValue = document.cookie
@@ -75,8 +78,18 @@
     </div>
 {/each}
 
+
 <h3>Player List</h3>
-{let allPlayers = $derived(currentMatch?.getMatchPlayers.filter(mp => mp.matchSubTeam === subTeamID && showAvailability[mp.availability]).map(mp => teams.currentTeam?.getPlayerByID(mp.playerID)?.name))}
+<div style="margin-bottom: 0.5rem;">
+    <label for={"subMarker"}>
+        <input
+            type="checkbox"
+            bind:checked={showSubMarker}
+            id={"subMarker"}
+        />
+        Mark Substitutes
+    </label>
+</div>
 
 <div class="rounded_block">
     <pre>{allPlayers?.join("\n")}</pre>
@@ -99,26 +112,32 @@
     .Yes {
         background-color: var(--av-yes-bg);
         color: var(--av-yes-fg);
+        border: 2px solid var(--av-yes-fg);
+
     }
 
     .Maybe {
         background-color: var(--av-maybe-bg);
         color: var(--av-maybe-fg);
+        border: 2px solid var(--av-maybe-fg);
     }
 
     .No {
         background-color: var(--av-no-bg);
         color: var(--av-no-fg);
+        border: 2px solid var(--av-no-fg);
     }
 
     .Injured {
         background-color: var(--av-injured-bg);
         color: var(--av-injured-fg);
+        border: 2px solid var(--av-injured-fg);
     }
 
     .No-Reply {
         background-color: var(--av-no-reply-bg);
         color: var(--av-no-reply-fg);
+        border: 2px solid var(--av-no-reply-fg);
     }
 
     .substitute {
@@ -126,24 +145,9 @@
         background-color: transparent;
     }
 
-    .substitute.Yes {
-        border: 2px solid var(--av-yes-fg);
-    }
-
-    .substitute.Maybe {
-        border: 2px solid var(--av-maybe-fg);
-    }
-
-    .substitute.No {
-        border: 2px solid var(--av-no-fg);
-    }
-
-    .substitute.Injured {
-        border: 2px solid var(--av-injured-fg);
-    }
-
-    .substitute.No-Reply {
-        border: 2px solid var(--av-no-reply-fg);
+    :global(body.dark-mode) .substitute.No-Reply {
+        border: 2px solid var(--av-no-reply-bg);
+        color: var(--av-no-reply-bg);
     }
 
     pre {

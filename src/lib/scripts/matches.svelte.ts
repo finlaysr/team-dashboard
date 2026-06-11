@@ -30,7 +30,6 @@ export class Matches {
   addMatch(newDate: string, subTeamsInvolved: SubTeamsInvloved[], onlySubTeamPlayers: boolean): boolean {
     this.matches.push(new Match(this.matchIndex++, newDate.trim(), subTeamsInvolved, onlySubTeamPlayers));
     this.currentMatch = this.matches[this.matches.length - 1].getID;
-    console.log("Added match with ID: " + this.currentMatch);
     return true;
   }
 
