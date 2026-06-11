@@ -6,7 +6,7 @@ const STORAGE_KEY = "teamsData";
 class Teams {
   teams: Team[] = $state([]);
   currentTeam: Team | null = $state(null);
-  private teamIndex: TeamID = $state(0);
+  private teamIndex: TeamID = $state(1);
 
   loadFromStorage() {
     if (browser) {
@@ -35,7 +35,7 @@ class Teams {
   addTeam(name: string, subTeamNames: string[], youthTeam: boolean): boolean {
     if (this.teams.find(t => t.name == name)) { return false };
 
-    const newTeam = new Team(this.teamIndex++, name, youthTeam, 0, 0, undefined, undefined, subTeamNames, undefined);
+    const newTeam = new Team(this.teamIndex++, name, youthTeam, undefined, undefined, undefined, undefined, subTeamNames, undefined);
     this.teams.push(newTeam);
     this.currentTeam = newTeam;
     return true;

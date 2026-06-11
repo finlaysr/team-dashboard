@@ -4,7 +4,7 @@ import type { SubTeamsInvloved, MatchID } from "$lib/scripts/match.svelte";
 export class Matches {
   private matches: Match[] = $state([]);
   currentMatch: MatchID | null = $state(null);
-  private matchIndex: number = $state(0);
+  private matchIndex: number = $state(1);
 
   constructor(matches?: Match[], currentMatch?: MatchID | null, matchIndex?: number) {
     if (matches) {
@@ -30,6 +30,7 @@ export class Matches {
   addMatch(newDate: string, subTeamsInvolved: SubTeamsInvloved[], onlySubTeamPlayers: boolean): boolean {
     this.matches.push(new Match(this.matchIndex++, newDate.trim(), subTeamsInvolved, onlySubTeamPlayers));
     this.currentMatch = this.matches[this.matches.length - 1].getID;
+    console.log("Added match with ID: " + this.currentMatch);
     return true;
   }
 

@@ -37,7 +37,6 @@
 
     let currSubTeamTab: SubTeamID = $state(-1);
 
-    // FIX: When adding first match, it doesn't appear unil second match added.
 </script>
 
 <h2>Match Days</h2>

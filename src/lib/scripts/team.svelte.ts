@@ -8,12 +8,12 @@ export class Team {
   readonly subteams: SubTeam[] = $state([]);
   readonly players: Player[] = $state([]);
   youthTeam: boolean = $state(false);
-  private playerIndex: PlayerID = $state(0);
-  private subteamIndex: SubTeamID = $state(0);
+  private playerIndex: PlayerID = $state(1);
+  private subteamIndex: SubTeamID = $state(1);
 
   private matches: Matches = $state(new Matches());
 
-  constructor(teamID: TeamID, name: string, youthTeam: boolean, playerIndex: PlayerID = 0, subteamIndex: SubTeamID = 0, players?: Player[], matches?: Matches, subTeamNames?: string[], subteams?: SubTeam[]) {
+  constructor(teamID: TeamID, name: string, youthTeam: boolean, playerIndex: PlayerID = 1, subteamIndex: SubTeamID = 1, players?: Player[], matches?: Matches, subTeamNames?: string[], subteams?: SubTeam[]) {
     this.teamID = teamID;
     this.name = name.trim();
     this.playerIndex = playerIndex;
